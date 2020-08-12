@@ -26,7 +26,7 @@ class _BalanceState extends State<BalanceWidget> {
   }
 
 
-  Container _transactionIcon(Transaction transaction) {
+  Container _transactionIcon(WalletTransaction transaction) {
     return Container(
       child: Icon(transaction.received ? Icons.call_received : Icons.call_made),
       margin: EdgeInsets.only(right: 10),

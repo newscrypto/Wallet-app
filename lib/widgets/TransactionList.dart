@@ -10,8 +10,8 @@ class InfiniteScroll extends StatefulWidget {
 }
 
 class _InfiniteScrollState extends State<InfiniteScroll> {
-  List<Transaction> _data = [];
-  Future<List<Transaction>> _future;
+  List<WalletTransaction> _data = [];
+  Future<List<WalletTransaction>> _future;
   int _currentPage = 1;
   ScrollController _controller =
       ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
@@ -34,30 +34,28 @@ class _InfiniteScrollState extends State<InfiniteScroll> {
 
   var random = new Random();
 
-  Future<List<Transaction>> getTransactions() {
-    List<Transaction> transactions = new List<Transaction>();
+  Future<List<WalletTransaction>> getTransactions() {
+    List<WalletTransaction> transactions = new List<WalletTransaction>();
     for (var i = 1; i < 50; i++) {
       var receiveInt = random.nextInt(100);
       var amount = random.nextInt(10000);
-      var transaction = Transaction(
+      var transaction = WalletTransaction(
         id: i,
-        name: "transaction $i",
         received: receiveInt > 50,
-        amount: amount.toDouble(),
       );
       transactions.add(transaction);
     }
     return Future.value(transactions);
   }
 
-  Future<List<Transaction>> loadData() async {
+  Future<List<WalletTransaction>> loadData() async {
     var tracks = await getTransactions();
     _data.addAll(tracks);
     _currentPage++;
     return _data;
   }
 
-  Container _transactionIcon(Transaction transaction) {
+  Container _transactionIcon(WalletTransaction transaction) {
     return Container(
       child: Icon(transaction.received ? Icons.call_received : Icons.call_made),
       margin: EdgeInsets.only(right: 10),
@@ -70,14 +68,14 @@ class _InfiniteScrollState extends State<InfiniteScroll> {
         future: _future,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
-            List<Transaction> loaded = snapshot.data;
+            List<WalletTransaction> loaded = snapshot.data;
             return ListView.builder(
               padding: EdgeInsets.only(top: 10),
               itemCount: loaded.length + 1,
               controller: _controller,
               itemBuilder: (BuildContext context, int index) {
                 if (index < loaded.length) {
-                  Transaction transaction = loaded[index];
+                  WalletTransaction transaction = loaded[index];
                   return Container(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
