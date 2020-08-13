@@ -152,7 +152,7 @@ class _HeaderState extends State<HeaderState> {
         gradient: LinearGradient(
           colors: [
             Colors.transparent,
-            ColorTween(begin: Colors.black12, end: Colors.black38)
+            ColorTween(begin: Colors.black26, end: Colors.black54)
                 .evaluate(animation)
           ],
           begin: Alignment.topCenter,

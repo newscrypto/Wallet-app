@@ -78,7 +78,7 @@ class _FadeInPageTransition extends StatelessWidget {
         Animation<double>
             routeAnimation, // The route's linear 0.0 - 1.0 animation.
     @required this.child,
-  })  : _opacityAnimation = routeAnimation.drive(_easeInTween),
+  })  : _opacityAnimation = routeAnimation.drive(_fastOutSlowInTween),
         super(key: key);
 
   // Fractional offset from 1/4 screen below the top to fully on screen.

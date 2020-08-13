@@ -4,9 +4,11 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:newscrypto_wallet/screens/header/Header.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/widgets/Fab.dart';
+import 'package:newscrypto_wallet/widgets/TransfareButton.dart';
 
 import 'models/Trnsaction.dart';
 
@@ -112,63 +114,85 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       floatingActionButton: FabWidget(),
-      body: NotificationListener<ScrollEndNotification>(
-        onNotification: (_) {
-          _snapAppbar();
-          return false;
-        },
-        child: CustomScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          controller: _controller,
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              stretch: true,
-              flexibleSpace: HeaderState(
-                maxHeight: maxHeight,
-                minHeight: minHeight,
+      body: Stack(children: [
+        NotificationListener<ScrollEndNotification>(
+          onNotification: (_) {
+            _snapAppbar();
+            return false;
+          },
+          child: CustomScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                stretch: true,
+                flexibleSpace: HeaderState(
+                  maxHeight: maxHeight,
+                  minHeight: minHeight,
+                ),
+                expandedHeight: maxHeight - MediaQuery.of(context).padding.top,
               ),
-              expandedHeight: maxHeight - MediaQuery.of(context).padding.top,
-            ),
-            FutureBuilder(
-                future: _future,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.hasData) {
-                    List<WalletTransaction> loaded = snapshot.data;
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        if (loaded.length > index)
-                          return _buildCard(loaded[index], index);
-                        else
-                          return SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Center(
-                              child: Text(
-                                "List is empty",
-                                style: TextStyle(
-                                  color: Colors.white,
+              FutureBuilder(
+                  future: _future,
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      List<WalletTransaction> loaded = snapshot.data;
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          if (loaded.length > index) {
+                            if (index == 0 ||
+                                (loaded[index - 1].dateTime.day !=
+                                    loaded[index].dateTime.day)) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                      left: 20,
+                                      right: 20,
+                                      top: 20,
+                                    ),
+                                    child: Text(DateFormat.yMd()
+                                        .format(loaded[index].dateTime)),
+                                  ),
+                                  _buildCard(loaded[index], index)
+                                ],
+                              );
+                            }
+                            return _buildCard(loaded[index], index);
+                          } else
+                            return SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(
+                                child: Text(
+                                  "List is empty",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
+                            );
+                        }, childCount: loaded.length),
+                      );
+                    } else
+                      return SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(
+                          child: Text(
+                            "No transactions!",
+                            style: TextStyle(
+                              color: Colors.white,
                             ),
-                          );
-                      }, childCount: loaded.length),
-                    );
-                  } else
-                    return SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(
-                        child: Text(
-                          "No transactions!",
-                          style: TextStyle(
-                            color: Colors.white,
                           ),
                         ),
-                      ),
-                    );
-                })
-          ],
+                      );
+                  })
+            ],
+          ),
         ),
-      ),
+//        AnimatedContainerApp(),
+      ]),
     );
   }
 
@@ -187,7 +211,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(transaction.received ? "Received" : "Sent"),
-                      Text(transaction.createdAt),
+                      Text(DateFormat.Hm().format(transaction.dateTime)),
                     ],
                   )
                 ],
@@ -209,8 +233,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.all(Radius.circular(5)),
       ),
-      margin: EdgeInsets.only(
-          left: 20, right: 20, top: index == 0 ? 20 : 10, bottom: 10),
+      margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
       padding: EdgeInsets.all(20),
     );
   }

@@ -11,16 +11,19 @@ class WalletTransaction {
   final String to;
   final String hash;
   final String createdAt;
+  final DateTime dateTime;
 
-  WalletTransaction(
-      {this.id,
-      this.received,
-      this.amount,
-      this.paginationToken,
-      this.from,
-      this.to,
-      this.createdAt,
-      this.hash});
+  WalletTransaction({
+    this.id,
+    this.received,
+    this.amount,
+    this.paginationToken,
+    this.from,
+    this.to,
+    this.createdAt,
+    this.hash,
+    this.dateTime,
+  });
 
   factory WalletTransaction.fromJson(Map<String, dynamic> json) {
     return WalletTransaction(
@@ -45,6 +48,7 @@ class WalletTransaction {
           DateFormat.yMd().add_Hm().format(DateTime.parse(payment.createdAt)),
       hash: payment.transactionHash,
       received: received,
+      dateTime: DateTime.parse(payment.createdAt),
     );
   }
 }
