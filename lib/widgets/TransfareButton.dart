@@ -22,6 +22,7 @@ class _AnimatedContainerAppState extends State<AnimatedContainerApp>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
+    super.initState();
   }
 
   @override

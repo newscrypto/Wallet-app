@@ -30,6 +30,7 @@ class FabWidgetState extends State<FabWidget> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    super.initState();
   }
 
   Widget build(BuildContext context) {

@@ -63,7 +63,7 @@ Future<List<WalletTransaction>> getAccountTransactions(var cursor) async {
   List<WalletTransaction> transactions = [];
   for (OperationResponse response in payments.records) {
     if (response is PaymentOperationResponse) {
-      PaymentOperationResponse por = response as PaymentOperationResponse;
+      PaymentOperationResponse por = response;
       if (por.transactionSuccessful && por.assetCode == "NWC") {
         transactions
             .add(new WalletTransaction.fromPaymentOperation(por, accountId));
