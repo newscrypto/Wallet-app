@@ -1,61 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Price.dart';
-import 'package:newscrypto_wallet/models/Statistics.dart';
 import 'package:newscrypto_wallet/screens/header/widgets/Chart.dart';
-import 'package:newscrypto_wallet/services/Acount.dart';
-import 'package:newscrypto_wallet/services/PriceHistoryService.dart';
 
-class HeaderState extends StatefulWidget {
+class HeaderState extends StatelessWidget {
   final double maxHeight;
   final double minHeight;
+  final Balance balance;
+  final List<PriceHistory> prices;
 
-  const HeaderState({Key key, this.maxHeight, this.minHeight})
-      : super(key: key);
-
-  @override
-  _HeaderState createState() =>
-      _HeaderState(maxHeight: maxHeight, minHeight: minHeight);
-}
-
-class _HeaderState extends State<HeaderState> {
-  final double maxHeight;
-  final double minHeight;
-  Balance balance = Balance(nwc: 0, usd: 0);
-  List<PriceHistory> prices;
-
-  _HeaderState({
+  HeaderState({
     @required this.maxHeight,
     @required this.minHeight,
+    @required this.balance,
+    @required this.prices,
   });
-
-  @override
-  void initState() {
-    loadHistory();
-    loadBalance();
-    super.initState();
-  }
-
-  Future<List<PriceHistory>> loadHistory() async {
-    var startAt =
-        (DateTime.now().subtract(Duration(days: 14)).millisecondsSinceEpoch /
-                1000)
-            .round();
-    List<PriceHistory> _data = await fetchPriceHistory(startAt, "1day");
-    setState(() {
-      prices = _data;
-    });
-  }
-
-  Future<List<PriceHistory>> loadBalance() async {
-    double nwcBalance = await getAccountBalance();
-    Statistics nwcPrice = await fetchStats();
-    print(nwcPrice.last);
-    setState(() {
-      balance = Balance(nwc: nwcBalance, usd: nwcPrice.last * nwcBalance);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

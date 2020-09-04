@@ -5,11 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:newscrypto_wallet/models/Balance.dart';
+import 'package:newscrypto_wallet/models/Statistics.dart';
 import 'package:newscrypto_wallet/screens/header/Header.dart';
+import 'package:newscrypto_wallet/screens/start/StartWizard.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
+import 'package:newscrypto_wallet/services/PriceHistoryService.dart';
 import 'package:newscrypto_wallet/widgets/Fab.dart';
 import 'package:newscrypto_wallet/widgets/TransfareButton.dart';
 
+import 'models/Price.dart';
 import 'models/Trnsaction.dart';
 
 final Color darkBlue = Color.fromARGB(255, 18, 32, 47);
@@ -47,12 +52,36 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: SliverAppBarSnap(),
-        ),
-      ),
+      // home: StartWizard(),
+      home: FutureBuilder<String>(
+          future: getAccountID(),
+          builder: (context, AsyncSnapshot<String> snapshot) {
+            if (snapshot.hasData) {
+              print(snapshot.data);
+              if (snapshot.data.isEmpty) return StartWizard();
+              return StartWizard();
+            } else {
+              return StartWizard();
+            }
+          }),
     );
+  }
+}
+
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
 
@@ -61,7 +90,8 @@ class SliverAppBarSnap extends StatefulWidget {
   _SliverAppBarSnapState createState() => _SliverAppBarSnapState();
 }
 
-class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
+class _SliverAppBarSnapState extends State<SliverAppBarSnap>
+    with TickerProviderStateMixin {
   List<WalletTransaction> _data = [];
   final _controller =
       ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
@@ -76,6 +106,10 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
 
   Future<List<WalletTransaction>> _future;
 
+  Balance balance = new Balance(nwc: 0, usd: 0);
+  Statistics statistics;
+  List<PriceHistory> prices;
+
   @override
   void initState() {
     _controller.addListener(() {
@@ -87,6 +121,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
       }
     });
     _future = loadData();
+    loadBalance();
+    loadHistory();
     super.initState();
   }
 
@@ -103,7 +139,6 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
     if (_data.isNotEmpty) {
       cursor = _data[_data.length - 1].paginationToken;
     }
-    print(cursor);
     var tracks = await getTransactions(cursor);
     _data.addAll(tracks);
     return _data;
@@ -113,7 +148,10 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      floatingActionButton: FabWidget(),
+      floatingActionButton: FabWidget(
+        statistic: statistics,
+        balance: balance,
+      ),
       body: Stack(children: [
         NotificationListener<ScrollEndNotification>(
           onNotification: (_) {
@@ -130,6 +168,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
                 flexibleSpace: HeaderState(
                   maxHeight: maxHeight,
                   minHeight: minHeight,
+                  balance: balance,
+                  prices: prices,
                 ),
                 expandedHeight: maxHeight - MediaQuery.of(context).padding.top,
               ),
@@ -191,7 +231,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
             ],
           ),
         ),
-//        AnimatedContainerApp(),
+        AnimatedContainerApp(),
       ]),
     );
   }
@@ -222,11 +262,12 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
             child: Text(
               (transaction.received ? "+" : "-") + " ${transaction.amount} NWC",
               style: TextStyle(
-                  color: transaction.received
-                      ? Colors.lightGreen
-                      : Colors.deepOrangeAccent),
+                color: transaction.received
+                    ? Color(0xff00FFBB)
+                    : Color(0xffff3369),
+              ),
             ),
-          )
+          ),
         ],
       ),
       decoration: BoxDecoration(
@@ -255,5 +296,26 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap> {
       Future.microtask(() => _controller.animateTo(snapOffset,
           duration: Duration(milliseconds: 200), curve: Curves.easeIn));
     }
+  }
+
+  void loadBalance() async {
+    double nwcBalance = await getAccountBalance();
+    Statistics nwcPrice = await fetchStats();
+
+    setState(() {
+      statistics = nwcPrice;
+      balance = new Balance(nwc: nwcBalance, usd: nwcPrice.last * nwcBalance);
+    });
+  }
+
+  void loadHistory() async {
+    var startAt =
+        (DateTime.now().subtract(Duration(days: 14)).millisecondsSinceEpoch /
+                1000)
+            .round();
+    List<PriceHistory> _data = await fetchPriceHistory(startAt, "1day");
+    setState(() {
+      prices = _data;
+    });
   }
 }

@@ -1,10 +1,17 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:newscrypto_wallet/models/Balance.dart';
+import 'package:newscrypto_wallet/models/Statistics.dart';
 import 'package:newscrypto_wallet/screens/receive/Receive.dart';
 import 'package:newscrypto_wallet/screens/send/Send.dart';
 
 class FabWidget extends StatefulWidget {
+  final Statistics statistic;
+  final Balance balance;
+
+  const FabWidget({Key key, this.statistic, this.balance}) : super(key: key);
+
   @override
   State createState() => FabWidgetState();
 }
@@ -75,7 +82,11 @@ class FabWidgetState extends State<FabWidget> with TickerProviderStateMixin {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Send()),
+                  MaterialPageRoute(
+                      builder: (context) => Send(
+                            statistic: widget.statistic,
+                            balance: widget.balance,
+                          )),
                 );
               },
             ),

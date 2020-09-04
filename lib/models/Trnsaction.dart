@@ -1,5 +1,4 @@
 import 'package:intl/intl.dart';
-import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 
 class WalletTransaction {
@@ -34,8 +33,8 @@ class WalletTransaction {
   }
 
   factory WalletTransaction.fromPaymentOperation(
-      PaymentOperationResponse payment) {
-    bool received = getAccountID() == payment.to.accountId;
+      PaymentOperationResponse payment, String accountId) {
+    bool received = accountId == payment.to.accountId;
     print(payment.from.accountId);
     return WalletTransaction(
       id: payment.id,
