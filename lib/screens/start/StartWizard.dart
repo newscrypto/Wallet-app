@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:newscrypto_wallet/screens/NewWallet.dart';
 import 'package:newscrypto_wallet/screens/import/Import.dart';
+import 'package:newscrypto_wallet/screens/pincode/PinCode.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
 import 'package:newscrypto_wallet/widgets/Logo.dart';
@@ -38,7 +40,9 @@ class StartWizard extends StatelessWidget {
                   function: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Import()),
+                      MaterialPageRoute(
+                        builder: (context) => NewWallet(),
+                      ),
                     );
                   },
                 ),
@@ -49,7 +53,6 @@ class StartWizard extends StatelessWidget {
                   color: Palette.secondaryButtonDefault,
                   fontsize: fontsize,
                   function: () {
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => Import()),

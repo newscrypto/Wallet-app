@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newscrypto_wallet/screens/pinTransactionConfirm/PinTransactionConfirm.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
@@ -6,7 +7,6 @@ import 'package:newscrypto_wallet/widgets/PrimaryButton.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 
 import '../../main.dart';
-
 
 class ConfirmSend extends StatefulWidget {
   final double sendAmountNWC;
@@ -26,6 +26,22 @@ class ConfirmSend extends StatefulWidget {
 }
 
 class _ConfirmSendState extends State<ConfirmSend> {
+  bool _confirm = false;
+  bool _loading = false;
+
+  void pinConfirm() async {
+    setState(() {
+      _confirm = false;
+      _loading = true;
+    });
+    bool response = await sendNWC(
+        widget.sendToAddress, widget.sendToMemo, widget.sendAmountNWC);
+    if (response) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => SliverAppBarSnap()),
+          (Route<dynamic> route) => false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,27 +130,23 @@ class _ConfirmSendState extends State<ConfirmSend> {
                 ),
                 // ),
                 PrimaryButton(
-                  title: "Confirm",
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  fontsize: 20,
-                  margin: EdgeInsets.only(top: 40, bottom: 10),
-                  padding: EdgeInsets.all(20),
-                  function: () async {
-                    bool response =
-                        await sendNWC(widget.sendToAddress, widget.sendToMemo, widget.sendAmountNWC);
-                    if (response) {
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => SliverAppBarSnap()),
-                          (Route<dynamic> route) => false);
-                    }
-                  },
-                ),
+                    title: "Confirm",
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    fontsize: 20,
+                    margin: EdgeInsets.only(top: 40, bottom: 10),
+                    padding: EdgeInsets.all(20),
+                    function: () async {
+                      setState(() {
+                        _confirm = true;
+                      });
+                    }),
                 SecondaryButton(
                   title: "Cancel",
                   width: MediaQuery.of(context).size.width * 0.8,
                   fontsize: 20,
-                  margin: EdgeInsets.only(top: 5,),
+                  margin: EdgeInsets.only(
+                    top: 5,
+                  ),
                   color: Palette.secondaryButtonDefault,
                   function: () {
                     Navigator.pop(context);
@@ -143,6 +155,26 @@ class _ConfirmSendState extends State<ConfirmSend> {
               ],
             ),
           ),
+          if (_confirm)
+            PinTransactionConfirm(
+              onComplete: pinConfirm,
+            ),
+          if (_loading)
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(color: Colors.black54),
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: MediaQuery.of(context).size.width * 0.6,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 10,
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primaryButtonDefault),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

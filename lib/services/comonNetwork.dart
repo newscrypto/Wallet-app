@@ -19,3 +19,12 @@ Dio getCoinGeckoDio() {
   Dio dio = new Dio(options);
   return dio;
 }
+Dio getMainDio() {
+  BaseOptions options = new BaseOptions(
+    baseUrl: "http://localhost:8000/v1/",
+    connectTimeout: 15000,
+    receiveTimeout: 10000,
+  );
+  Dio dio = new Dio(options);
+  return dio;
+}

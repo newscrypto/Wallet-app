@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newscrypto_wallet/main.dart';
+import 'package:newscrypto_wallet/screens/pincode/PinCode.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
@@ -25,7 +26,9 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme
+          .of(context)
+          .primaryColor,
       // resizeToAvoidBottomPadding: false,
       body: GestureDetector(
         onTap: () {
@@ -52,18 +55,26 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                     Container(
                       margin: EdgeInsets.symmetric(
                           vertical: 5,
-                          horizontal: MediaQuery.of(context).size.width * 0.1),
+                          horizontal: MediaQuery
+                              .of(context)
+                              .size
+                              .width * 0.1),
                       child: Text("Secret key:"),
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(
                           vertical: 5,
-                          horizontal: MediaQuery.of(context).size.width * 0.1),
+                          horizontal: MediaQuery
+                              .of(context)
+                              .size
+                              .width * 0.1),
                       padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).primaryColor,
+                        color: Theme
+                            .of(context)
+                            .primaryColor,
                       ),
                       child: TextField(
                         onChanged: (value) {
@@ -75,8 +86,14 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                       margin: EdgeInsets.only(
                         top: 10,
                         bottom: 10,
-                        left: MediaQuery.of(context).size.width * 0.1,
-                        right: MediaQuery.of(context).size.width * 0.1,
+                        left: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.1,
+                        right: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.1,
                       ),
                       child: Text(errorText),
                     ),
@@ -85,19 +102,30 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                       margin: EdgeInsets.only(
                         top: 10,
                         bottom: 40,
-                        left: MediaQuery.of(context).size.width * 0.1,
-                        right: MediaQuery.of(context).size.width * 0.1,
+                        left: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.1,
+                        right: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.1,
                       ),
-                      width: MediaQuery.of(context).size.width * 0.8,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width * 0.8,
                       color: Palette.secondaryButtonDefault,
                       fontsize: 20,
                       function: () async {
                         try {
                           await importNewWallet(secretKey);
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => SliverAppBarSnap()),
-                              (Route<dynamic> route) => false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PinCodeVerificationScreen(),
+                            ),
+                          );
                         } catch (e) {
                           setState(() {
                             errorText = e;

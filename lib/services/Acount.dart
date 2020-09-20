@@ -3,7 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 
 const ACCOUNT_ID_KEY = "ACCOUNT_ID";
+const ACCOUNT_ACTIVATED_KEY = "ACCOUNT_ACTIVATED";
 const ACCOUNT_SECRET_KEY = "ACCOUNT_SECRET";
+const PIN_CODE_KEY = "PIN_CODE";
+const String issuerKey =
+    "GDZJD363YP7P3TNYDK3ZD6GLXFMAI3GLVIH7CGFLNZWIZBQUCVE6PTU7";
+const ASSET_CODE = "NWC";
+
+final StellarSDK sdk = StellarSDK.PUBLIC;
 
 Future<String> getAccountID() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -21,6 +28,47 @@ Future<String> getAccountSecret() async {
   return prefs.getString(ACCOUNT_SECRET_KEY);
 }
 
+Future<bool> isActivated() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (!prefs.containsKey(ACCOUNT_ACTIVATED_KEY)) {
+    prefs.setBool(ACCOUNT_ACTIVATED_KEY, false);
+  }
+  return prefs.getBool(ACCOUNT_ACTIVATED_KEY);
+}
+
+Future<void> setActivate(bool activate) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(ACCOUNT_ACTIVATED_KEY, activate);
+}
+
+Future<String> getStartScreen() async {
+  bool login = await isLoginPin();
+  bool activated = await isActivated();
+  if (!activated) return "startScreen";
+  if (login) return "login";
+  return "transactions";
+}
+
+Future<bool> createNWCTrustLine() async {
+  String accountSecret = await getAccountSecret();
+  Asset nwcAsset = Asset.createNonNativeAsset(ASSET_CODE, issuerKey);
+
+  KeyPair senderKeyPair = KeyPair.fromSecretSeed(accountSecret);
+  AccountResponse sender = await sdk.accounts.account(senderKeyPair.accountId);
+
+  String limit = "922337203681";
+  ChangeTrustOperation cto =
+      ChangeTrustOperationBuilder(nwcAsset, limit).build();
+  Transaction transaction =
+      TransactionBuilder(sender).addOperation(cto).build();
+
+  transaction.sign(senderKeyPair, Network.PUBLIC);
+  SubmitTransactionResponse response = await sdk.submitTransaction(transaction);
+
+  print(response.success);
+  return response.success;
+}
+
 void setAccountId(String accountId, SharedPreferences prefs) {
   prefs.setString(ACCOUNT_ID_KEY, accountId);
 }
@@ -29,10 +77,40 @@ void setAccountSecret(String accountSecret, SharedPreferences prefs) {
   prefs.setString(ACCOUNT_SECRET_KEY, accountSecret);
 }
 
-const String issuerKey =
-    "GDZJD363YP7P3TNYDK3ZD6GLXFMAI3GLVIH7CGFLNZWIZBQUCVE6PTU7";
+Future<void> setPin(String pinCode) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(PIN_CODE_KEY, pinCode);
+}
 
-final StellarSDK sdk = StellarSDK.PUBLIC;
+Future<bool> comparePin(String pinCode) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String pin = prefs.getString(PIN_CODE_KEY);
+  return pin == pinCode;
+}
+
+Future<bool> isLoginPin() async {
+  String pinSettingKey = "balancePin";
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool pin = true;
+  if (prefs.containsKey(pinSettingKey))
+    pin = prefs.getBool(pinSettingKey);
+  else
+    prefs.setBool(pinSettingKey, true);
+
+  return pin;
+}
+
+Future<String> createNewWallet() async {
+  String accountId = await getAccountID();
+  if (accountId.isEmpty) {
+    KeyPair keyPair = KeyPair.random();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setAccountSecret(keyPair.secretSeed, prefs);
+    setAccountId(keyPair.accountId, prefs);
+    return keyPair.accountId;
+  }
+  return accountId;
+}
 
 Future<double> getAccountBalance() async {
   // Request the account data.
@@ -120,9 +198,11 @@ Future<bool> sendNWC(String destination, String memo, double amount) async {
 
 Future<bool> importNewWallet(String secretKey) async {
   KeyPair keyPair;
+  print(secretKey);
   try {
     keyPair = KeyPair.fromSecretSeed(secretKey);
   } catch (exception) {
+    print(exception);
     throw "Wrong secret key!";
   }
   if (!await checkAddress(keyPair.accountId)) throw "No trustline for NWC!";

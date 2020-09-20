@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Price.dart';
+import 'package:newscrypto_wallet/screens/Settings/Settings.dart';
 import 'package:newscrypto_wallet/screens/header/widgets/Chart.dart';
 
 class HeaderState extends StatelessWidget {
@@ -22,17 +23,32 @@ class HeaderState extends StatelessWidget {
       builder: (context, constraints) {
         final expandRatio = _calculateExpandRatio(constraints);
         final animation = AlwaysStoppedAnimation(expandRatio);
-        return Stack(
-          children: [
-            _buildGradient(animation),
-            _buildTitle(animation),
-            Align(
-                alignment: Alignment.topCenter,
+        return SafeArea(
+          child: Stack(
+            children: [
+              _buildGradient(animation),
+              _buildTitle(animation),
+
+              Align(
+                  alignment: Alignment.topCenter,
+                  child: Opacity(
+                    opacity: expandRatio,
+                    child: chart(context, prices, balance,
+                        constraints.maxHeight, animation),
+                  )),
+              Align(
+                alignment: Alignment.topRight,
                 child: Opacity(
                   opacity: expandRatio,
-                  child: chart(context, prices, balance, constraints.maxHeight,
-                      animation),
-                ))
+                  child: IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Settings()));
+                    },
+                  ),
+                ),
+              ),
 
 //                    child: Container(
 //                      width: MediaQuery.of(context).size.width * 0.90,
@@ -42,7 +58,8 @@ class HeaderState extends StatelessWidget {
 //                          ? GridlineDashPattern.withSampleData(prices)
 //                          : Container(),
 //                    ))),
-          ],
+            ],
+          ),
         );
       },
     );

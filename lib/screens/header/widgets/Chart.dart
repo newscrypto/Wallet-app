@@ -13,10 +13,8 @@ Widget chart(BuildContext context, List<PriceHistory> prices, Balance balance,
   DateTime toDate = prices[0].date;
   DateTime fromDate = prices[prices.length - 1].date;
   return Container(
-    height: Tween<double>(end: maxHeight - 130, begin: maxHeight - 50)
+    height: Tween<double>(end: maxHeight - 120, begin: maxHeight - 50)
         .evaluate(animation),
-    margin: EdgeInsets.only(
-        top: Tween<double>(begin: 0, end: 50).evaluate(animation)),
     width: MediaQuery.of(context).size.width,
     child: BezierChart(
       fromDate: fromDate,
@@ -67,4 +65,3 @@ Widget candlesticks(BuildContext context, List<PriceHistory> prices,
     child: OHLCVGraph(data: data, enableGridLines: true, volumeProp: 0.1),
   );
 }
-
