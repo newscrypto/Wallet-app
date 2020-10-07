@@ -24,8 +24,11 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
   ActivationInfo _activationInfo =
       new ActivationInfo(address: "", memo: "", amount: 0);
   String _publicKey = "";
-  String copyText = "Tap address to copy";
+  String copyText = "Tap to copy";
+  String copyMemoText = "Tap to copy";
   Color copyTextColor = Colors.white;
+  Color copyMemoTextColor = Colors.white;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -38,10 +41,16 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
     setState(() {
       _publicKey = address;
     });
-    getActivationInfo();
+    ActivationInfo newActivationInfo = await fetchActivationInfo(_publicKey);
+    setState(() {
+      _activationInfo = newActivationInfo;
+    });
   }
 
   void getActivationInfo() async {
+    setState(() {
+      _loading = true;
+    });
     ActivationInfo newActivationInfo = await fetchActivationInfo(_publicKey);
     if (newActivationInfo.activated) {
       setActivate(true);
@@ -58,6 +67,7 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
     }
     setState(() {
       _activationInfo = newActivationInfo;
+      _loading = false;
     });
   }
 
@@ -82,113 +92,151 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
       body: Stack(
         children: [
           BackgroundStack(),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Text(
-                  "To activate wallet send ${_activationInfo.amount} NWC to following address and memo and then press activate:",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20),
-                ),
-                margin: EdgeInsets.only(bottom: 30),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).primaryColor,
-                ),
-                padding: EdgeInsets.all(5),
-                child: QrImage(
-                  data: _activationInfo.address,
-                  version: QrVersions.auto,
-                  size: MediaQuery.of(context).size.width * 0.4,
-                  gapless: false,
-                  embeddedImage: AssetImage('assets/images/logo.png'),
-                  embeddedImageStyle: QrEmbeddedImageStyle(
-                    size: Size(20, 20),
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Text(
+                      "To activate your wallet, send at least ${_activationInfo.amount} NWC to the address listed below with the provided memo. The remaining funds will be automatically transferred to your new wallet after creation.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    margin: EdgeInsets.only(bottom: 30),
                   ),
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              Container(
-                child: Text(
-                  "Address:",
-                  textAlign: TextAlign.center,
-                ),
-                margin: EdgeInsets.only(top: 40, bottom: 10),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Clipboard.setData(
-                      ClipboardData(text: _activationInfo.address));
-                  setState(() {
-                    copyText = "Copied!";
-                    copyTextColor = Colors.greenAccent;
-                  });
-                  Timer(Duration(seconds: 3), () {
-                    setState(() {
-                      copyText = "Tap address to copy";
-                      copyTextColor = Colors.white;
-                    });
-                  });
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).primaryColor,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    padding: EdgeInsets.all(5),
+                    child: QrImage(
+                      data: _activationInfo.address,
+                      version: QrVersions.auto,
+                      size: MediaQuery.of(context).size.width * 0.4,
+                      gapless: false,
+                      embeddedImage: AssetImage('assets/images/logo.png'),
+                      embeddedImageStyle: QrEmbeddedImageStyle(
+                        size: Size(20, 20),
+                      ),
+                      foregroundColor: Colors.white,
+                    ),
                   ),
-                  padding: EdgeInsets.all(20),
-                  margin: EdgeInsets.symmetric(horizontal: 30),
-                  child: Text(
-                    _activationInfo.address,
-                    textAlign: TextAlign.center,
+                  Container(
+                    child: Text(
+                      "Address:",
+                      textAlign: TextAlign.center,
+                    ),
+                    margin: EdgeInsets.only(top: 40, bottom: 10),
                   ),
-                ),
+                  GestureDetector(
+                    onTap: () {
+                      Clipboard.setData(
+                          ClipboardData(text: _activationInfo.address));
+                      setState(() {
+                        copyText = "Copied!";
+                        copyTextColor = Colors.greenAccent;
+                      });
+                      Timer(Duration(seconds: 3), () {
+                        setState(() {
+                          copyText = "Tap to copy";
+                          copyTextColor = Colors.white;
+                        });
+                      });
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      padding: EdgeInsets.all(20),
+                      margin: EdgeInsets.symmetric(horizontal: 30),
+                      child: Text(
+                        _activationInfo.address,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      copyText,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: copyTextColor),
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Clipboard.setData(
+                          ClipboardData(text: _activationInfo.memo));
+                      setState(() {
+                        copyMemoText = "Copied!";
+                        copyMemoTextColor = Colors.greenAccent;
+                      });
+                      Timer(Duration(seconds: 3), () {
+                        setState(() {
+                          copyMemoText = "Tap to copy";
+                          copyMemoTextColor = Colors.white;
+                        });
+                      });
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      padding: EdgeInsets.all(20),
+                      margin: EdgeInsets.symmetric(horizontal: 30),
+                      child: Text(
+                        _activationInfo.memo,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      copyMemoText,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: copyMemoTextColor),
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                  ),
+                  SecondaryButton(
+                    title: "Activate",
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    fontsize: fontsize,
+                    margin: EdgeInsets.only(top: 5),
+                    color: Palette.primaryButtonDefault,
+                    function: () {
+                      getActivationInfo();
+                    },
+                  ),
+                ],
               ),
-              Container(
-                child: Text(
-                  copyText,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: copyTextColor),
-                ),
-                margin: EdgeInsets.only(top: 10, bottom: 10),
-              ),
-              Container(
-                child: Text(
-                  "Memo:",
-                  textAlign: TextAlign.center,
-                ),
-                margin: EdgeInsets.only(top: 10, bottom: 10),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).primaryColor,
-                ),
-                padding: EdgeInsets.all(20),
-                margin: EdgeInsets.symmetric(horizontal: 30),
-                child: Text(
-                  _activationInfo.memo,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SecondaryButton(
-                title: "Activate",
-                width: MediaQuery.of(context).size.width * 0.8,
-                fontsize: fontsize,
-                margin: EdgeInsets.only(top: 5),
-                color: Palette.primaryButtonDefault,
-                function: () {
-                  getActivationInfo();
-                },
-              ),
-            ],
+            ),
           ),
+          if (_loading)
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(color: Colors.black54),
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: MediaQuery.of(context).size.width * 0.6,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 10,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Palette.primaryButtonDefault),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

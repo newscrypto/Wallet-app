@@ -4,10 +4,15 @@ import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 
 const ACCOUNT_ID_KEY = "ACCOUNT_ID";
 const ACCOUNT_ACTIVATED_KEY = "ACCOUNT_ACTIVATED";
+const NEW_TRUSTLINE_KEY = "NEW_TRUSTLINE";
 const ACCOUNT_SECRET_KEY = "ACCOUNT_SECRET";
 const PIN_CODE_KEY = "PIN_CODE";
 const String issuerKey =
     "GDZJD363YP7P3TNYDK3ZD6GLXFMAI3GLVIH7CGFLNZWIZBQUCVE6PTU7";
+const String issuerKeyNew =
+    "GAAPUOQWOZAG3PENRN7FEPYWXVGJBJVBL6EUE2ZHN5TSY7WBXQDO7AY2";
+const String distribution =
+    "GBPAWN5KBPN2H4HLOR6SXNDLFBMEORYU4PZ77BK3Z3YK2IRA6HSJWIXL";
 const ASSET_CODE = "NWC";
 
 final StellarSDK sdk = StellarSDK.PUBLIC;
@@ -36,6 +41,14 @@ Future<bool> isActivated() async {
   return prefs.getBool(ACCOUNT_ACTIVATED_KEY);
 }
 
+Future<bool> isNewTrustline() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (!prefs.containsKey(NEW_TRUSTLINE_KEY)) {
+    prefs.setBool(NEW_TRUSTLINE_KEY, false);
+  }
+  return prefs.getBool(NEW_TRUSTLINE_KEY);
+}
+
 Future<void> setActivate(bool activate) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool(ACCOUNT_ACTIVATED_KEY, activate);
@@ -52,6 +65,33 @@ Future<String> getStartScreen() async {
 Future<bool> createNWCTrustLine() async {
   String accountSecret = await getAccountSecret();
   Asset nwcAsset = Asset.createNonNativeAsset(ASSET_CODE, issuerKey);
+  Asset nwcAssetNew = Asset.createNonNativeAsset(ASSET_CODE, issuerKeyNew);
+
+  KeyPair senderKeyPair = KeyPair.fromSecretSeed(accountSecret);
+  AccountResponse sender = await sdk.accounts.account(senderKeyPair.accountId);
+
+  String limit = "922337203681";
+  ChangeTrustOperation cto =
+      ChangeTrustOperationBuilder(nwcAsset, limit).build();
+  ChangeTrustOperation ctoNew =
+      ChangeTrustOperationBuilder(nwcAssetNew, limit).build();
+  Transaction transaction =
+      TransactionBuilder(sender).addOperation(cto).addOperation(ctoNew).build();
+
+  transaction.sign(senderKeyPair, Network.PUBLIC);
+  SubmitTransactionResponse response = await sdk.submitTransaction(transaction);
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(NEW_TRUSTLINE_KEY, true);
+
+  return response.success;
+}
+
+Future<bool> createNewNWCTrustLine() async {
+  bool newTrustLneCreated = await isNewTrustline();
+  if (newTrustLneCreated) return true;
+  String accountSecret = await getAccountSecret();
+  Asset nwcAsset = Asset.createNonNativeAsset(ASSET_CODE, issuerKeyNew);
 
   KeyPair senderKeyPair = KeyPair.fromSecretSeed(accountSecret);
   AccountResponse sender = await sdk.accounts.account(senderKeyPair.accountId);
@@ -66,6 +106,8 @@ Future<bool> createNWCTrustLine() async {
   SubmitTransactionResponse response = await sdk.submitTransaction(transaction);
 
   print(response.success);
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(NEW_TRUSTLINE_KEY, true);
   return response.success;
 }
 
@@ -120,10 +162,12 @@ Future<double> getAccountBalance() async {
 // You can check the `balance`, `sequence`, `flags`, `signers`, `data` etc.
   double nwcBalance = 0;
   for (Balance balance in account.balances) {
-    switch (balance.assetIssuer) {
-      case issuerKey:
-        nwcBalance = double.parse(balance.balance);
-        break;
+    print(balance.assetCode);
+    if (balance.assetCode == ASSET_CODE) {
+      nwcBalance += double.parse(balance.balance);
+    }
+    if (balance.assetIssuer == issuerKey) {
+      swapNWC(double.parse(balance.balance));
     }
   }
   return nwcBalance;
@@ -142,7 +186,35 @@ Future<List<WalletTransaction>> getAccountTransactions(var cursor) async {
   for (OperationResponse response in payments.records) {
     if (response is PaymentOperationResponse) {
       PaymentOperationResponse por = response;
-      if (por.transactionSuccessful && por.assetCode == "NWC") {
+      if (por.transactionSuccessful &&
+          por.assetCode == "NWC" &&
+          por.to.accountId != issuerKey &&
+          por.from.accountId != distribution) {
+        transactions
+            .add(new WalletTransaction.fromPaymentOperation(por, accountId));
+      }
+    }
+  }
+  return transactions;
+}
+
+Future<List<WalletTransaction>> getAccountNewTransactions(var cursor) async {
+  // Request the account data.
+  String accountId = await getAccountID();
+  Page<OperationResponse> payments = await sdk.payments
+      .forAccount(accountId)
+      .order(RequestBuilderOrder.ASC)
+      .cursor(cursor)
+      .limit(10)
+      .execute();
+  List<WalletTransaction> transactions = [];
+  for (OperationResponse response in payments.records) {
+    if (response is PaymentOperationResponse) {
+      PaymentOperationResponse por = response;
+      if (por.transactionSuccessful &&
+          por.assetCode == "NWC" &&
+          por.to.accountId != issuerKey &&
+          por.from.accountId != distribution) {
         transactions
             .add(new WalletTransaction.fromPaymentOperation(por, accountId));
       }
@@ -155,16 +227,15 @@ Future<bool> checkAddress(String address) async {
   print(address);
   try {
     AccountResponse account = await sdk.accounts.account(address);
-    print(account.balances);
     for (Balance balance in account.balances) {
       print(balance.assetIssuer);
-      if (balance.assetIssuer == issuerKey) {
+      if (balance.assetIssuer == issuerKeyNew) {
         return true;
       }
     }
     return false;
   } catch (exception) {
-    return false;
+    throw "Wrong secret key!";
   }
 }
 
@@ -172,7 +243,7 @@ Future<bool> sendNWC(String destination, String memo, double amount) async {
   String accountSecret = await getAccountSecret();
 
   KeyPair senderKeyPair = KeyPair.fromSecretSeed(accountSecret);
-  Asset nwcAsset = Asset.createNonNativeAsset("NWC", issuerKey);
+  Asset nwcAsset = Asset.createNonNativeAsset("NWC", issuerKeyNew);
 // Load sender account data from the stellar network.
   AccountResponse sender = await sdk.accounts.account(senderKeyPair.accountId);
 
@@ -205,11 +276,37 @@ Future<bool> importNewWallet(String secretKey) async {
     print(exception);
     throw "Wrong secret key!";
   }
-  if (!await checkAddress(keyPair.accountId)) throw "No trustline for NWC!";
+  bool trustline = await checkAddress(keyPair.accountId);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   print(keyPair.accountId);
   setAccountId(keyPair.accountId, prefs);
   setAccountSecret(secretKey, prefs);
+  if (!trustline) createNWCTrustLine();
+  prefs.setBool(ACCOUNT_ACTIVATED_KEY, true);
   return true;
+}
+
+Future<bool> swapNWC(double amount) async {
+  String accountSecret = await getAccountSecret();
+
+  KeyPair senderKeyPair = KeyPair.fromSecretSeed(accountSecret);
+  Asset nwcAsset = Asset.createNonNativeAsset("NWC", issuerKey);
+  AccountResponse sender = await sdk.accounts.account(senderKeyPair.accountId);
+
+  Transaction transaction = new TransactionBuilder(sender)
+      .addOperation(
+          PaymentOperationBuilder(issuerKey, nwcAsset, amount.toString())
+              .build())
+      .addMemo(MemoText("SWAP"))
+      .build();
+
+  transaction.sign(senderKeyPair, Network.PUBLIC);
+
+  SubmitTransactionResponse response = await sdk.submitTransaction(transaction);
+  if (response.success) {
+    print("Payment sent");
+    return true;
+  }
+  return false;
 }

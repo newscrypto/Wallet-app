@@ -21,7 +21,7 @@ Dio getCoinGeckoDio() {
 }
 Dio getMainDio() {
   BaseOptions options = new BaseOptions(
-    baseUrl: "http://localhost:8000/v1/",
+    baseUrl: "https://wallet.newscrypto.io/v1/",
     connectTimeout: 15000,
     receiveTimeout: 10000,
   );

@@ -1,11 +1,11 @@
-class Balance {
+class UserBalance {
   final double nwc;
   final double usd;
 
-  Balance({this.nwc, this.usd});
+  UserBalance({this.nwc, this.usd});
 
-  factory Balance.fromJson(Map<String, dynamic> json) {
-    return Balance(
+  factory UserBalance.fromJson(Map<String, dynamic> json) {
+    return UserBalance(
       nwc: json['nwc'],
       usd: json['usd'],
     );

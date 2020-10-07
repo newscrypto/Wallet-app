@@ -12,9 +12,10 @@ import 'package:newscrypto_wallet/screens/header/Header.dart';
 import 'package:newscrypto_wallet/screens/start/StartWizard.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/services/PriceHistoryService.dart';
+import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Fab.dart';
 import 'package:newscrypto_wallet/widgets/TransfareButton.dart';
-
+import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart' as stellar;
 import 'models/Price.dart';
 import 'models/Trnsaction.dart';
 
@@ -44,8 +45,6 @@ class MyApp extends StatelessWidget {
           future: getStartScreen(),
           builder: (context, AsyncSnapshot<String> snapshot) {
             if (snapshot.hasData) {
-              print(snapshot.data);
-              return StartWizard();
               if (snapshot.data.isEmpty)
                 return StartWizard();
               else if (snapshot.data == "startScreen")
@@ -59,7 +58,6 @@ class MyApp extends StatelessWidget {
             } else {
               print("no data");
               return StartWizard();
-
             }
           }),
     );
@@ -104,12 +102,14 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
 
   Future<List<WalletTransaction>> _future;
 
-  Balance balance = new Balance(nwc: 0, usd: 0);
+  UserBalance balance = new UserBalance(nwc: 0, usd: 0);
   Statistics statistics;
   List<PriceHistory> prices;
+  bool _loadingNewTransactions = false;
 
   @override
   void initState() {
+    createNewNWCTrustLine();
     _controller.addListener(() {
       var isEnd = _controller.offset == _controller.position.maxScrollExtent;
       if (isEnd) {
@@ -124,7 +124,26 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   var random = new Random();
+
+  Future<void> refreshTransactions() async {
+    _future = loadNewData();
+
+    double nwcBalance = await getAccountBalance();
+    Statistics nwcPrice = await fetchStats();
+    setState(() {
+      statistics = nwcPrice;
+      balance =
+          new UserBalance(nwc: nwcBalance, usd: nwcPrice.last * nwcBalance);
+    });
+    return _future;
+  }
 
   Future<List<WalletTransaction>> getTransactions(var cursor) async {
     List<WalletTransaction> walletTransaction =
@@ -139,6 +158,19 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
     }
     var tracks = await getTransactions(cursor);
     _data.addAll(tracks);
+    return _data;
+  }
+
+  Future<List<WalletTransaction>> loadNewData() async {
+    var cursor = "now";
+    if (_data.isNotEmpty) {
+      cursor = _data[0].paginationToken;
+    }
+    List<WalletTransaction> walletTransaction =
+        await getAccountNewTransactions(cursor);
+    for (var transaction in walletTransaction) {
+      _data.insert(0, transaction);
+    }
     return _data;
   }
 
@@ -163,6 +195,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
               SliverAppBar(
                 pinned: true,
                 stretch: true,
+                onStretchTrigger: refreshTransactions,
                 flexibleSpace: HeaderState(
                   maxHeight: maxHeight,
                   minHeight: minHeight,
@@ -185,6 +218,20 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
+                                  if (index == 0 && _loadingNewTransactions)
+                                    Center(
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        margin: EdgeInsets.only(top: 20),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Palette.primaryButtonDefault),
+                                        ),
+                                      ),
+                                    ),
                                   Container(
                                     margin: EdgeInsets.only(
                                       left: 20,
@@ -302,7 +349,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
 
     setState(() {
       statistics = nwcPrice;
-      balance = new Balance(nwc: nwcBalance, usd: nwcPrice.last * nwcBalance);
+      balance =
+          new UserBalance(nwc: nwcBalance, usd: nwcPrice.last * nwcBalance);
     });
   }
 

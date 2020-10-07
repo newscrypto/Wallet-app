@@ -13,7 +13,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class Send extends StatefulWidget {
   final Statistics statistic;
-  final Balance balance;
+  final UserBalance balance;
 
   const Send({Key key, this.statistic, this.balance}) : super(key: key);
 
@@ -22,7 +22,7 @@ class Send extends StatefulWidget {
 }
 
 class _SendState extends State<Send> with TickerProviderStateMixin {
-  String copyText = "Tap address to copy";
+  String copyText = "Tap to copy";
   Color copyTextColor = Colors.white;
   TextEditingController _textController;
   AnimationController _controller;

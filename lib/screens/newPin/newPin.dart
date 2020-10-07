@@ -77,7 +77,7 @@ class _NewPinState extends State<NewPin> with SingleTickerProviderStateMixin {
                   transform: Matrix4.translation(_shake()),
                   child: PinInput(
                     inputLength: currentText.length,
-                    title: "Confirrm pin",
+                    title: "Confirm pin",
                   ),
                 ),
                 Spacer(),

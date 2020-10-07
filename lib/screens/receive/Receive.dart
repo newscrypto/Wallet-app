@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
-import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
@@ -16,13 +15,13 @@ class Receive extends StatefulWidget {
 }
 
 class _ReceiveState extends State<Receive> {
-  String copyText = "Tap address to copy";
+  String copyText = "Tap to copy";
   Color copyTextColor = Colors.white;
   String accountId = "";
 
   @override
   void initState() {
-    copyText = "Tap address to copy";
+    copyText = "Tap to copy";
     copyTextColor = Colors.white;
     loadAccountId();
     super.initState();
@@ -94,7 +93,7 @@ class _ReceiveState extends State<Receive> {
                   });
                   Timer(Duration(seconds: 3), () {
                     setState(() {
-                      copyText = "Tap address to copy";
+                      copyText = "Tap to copy";
                       copyTextColor = Colors.white;
                     });
                   });
@@ -127,7 +126,7 @@ class _ReceiveState extends State<Receive> {
                 margin: EdgeInsets.only(top: 5),
                 color: Palette.primaryButtonDefault,
                 function: () {
-                  Share.share('My nwc address is:\n ${getAccountID()}');
+                  Share.share('My nwc address is:\n $accountId');
                 },
               ),
             ],

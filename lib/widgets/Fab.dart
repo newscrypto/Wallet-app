@@ -8,7 +8,7 @@ import 'package:newscrypto_wallet/screens/send/Send.dart';
 
 class FabWidget extends StatefulWidget {
   final Statistics statistic;
-  final Balance balance;
+  final UserBalance balance;
 
   const FabWidget({Key key, this.statistic, this.balance}) : super(key: key);
 

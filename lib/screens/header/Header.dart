@@ -7,7 +7,7 @@ import 'package:newscrypto_wallet/screens/header/widgets/Chart.dart';
 class HeaderState extends StatelessWidget {
   final double maxHeight;
   final double minHeight;
-  final Balance balance;
+  final UserBalance balance;
   final List<PriceHistory> prices;
 
   HeaderState({

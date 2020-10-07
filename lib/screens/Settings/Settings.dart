@@ -74,7 +74,7 @@ class _SettingsState extends State<Settings> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("PIN to see balance"),
+                  Text("PIN lock"),
                   Switch(
                     value: pinBalanceSwitch,
                     onChanged: (value) {
@@ -111,14 +111,9 @@ class _SettingsState extends State<Settings> {
                     "Show secret key",
                   ),
                 ),
-                onTapDown: (tapDownDetails) {
+                onTap: () {
                   setState(() {
-                    isSecretVisible = true;
-                  });
-                },
-                onTapUp: (details) {
-                  setState(() {
-                    isSecretVisible = false;
+                    isSecretVisible = !isSecretVisible;
                   });
                 },
               ),

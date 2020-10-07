@@ -14,8 +14,7 @@ class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
 
-class _LoginState extends State<Login>
-    with SingleTickerProviderStateMixin {
+class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   String currentText = "";
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
@@ -85,36 +84,12 @@ class _LoginState extends State<Login>
                   transform: Matrix4.translation(_shake()),
                   child: PinInput(
                     inputLength: currentText.length,
-                    title: "Enter pin to complete transaction",
+                    title: "Enter pin",
                   ),
                 ),
                 Spacer(),
                 NumPad(
                   onNumberTap: _onNumberTap,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    FlatButton(
-                      child: Text("Back"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    Opacity(
-                      opacity: currentText.isNotEmpty ? 1 : 0,
-                      child: FlatButton(
-                        child: Text("Delete"),
-                        onPressed: () {
-                          if (currentText.isNotEmpty)
-                            setState(() {
-                              currentText = currentText.substring(
-                                  0, currentText.length - 1);
-                            });
-                        },
-                      ),
-                    )
-                  ],
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.07,

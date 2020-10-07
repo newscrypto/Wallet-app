@@ -5,7 +5,7 @@ import 'package:flutter_candlesticks/flutter_candlesticks.dart';
 import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Price.dart';
 
-Widget chart(BuildContext context, List<PriceHistory> prices, Balance balance,
+Widget chart(BuildContext context, List<PriceHistory> prices, UserBalance balance,
     var maxHeight, Animation<double> animation) {
   if (prices == null || prices.isEmpty) {
     return Container();
@@ -42,7 +42,7 @@ Widget chart(BuildContext context, List<PriceHistory> prices, Balance balance,
 }
 
 Widget candlesticks(BuildContext context, List<PriceHistory> prices,
-    Balance balance, var maxHeight) {
+    UserBalance balance, var maxHeight) {
   if (prices == null || prices.isEmpty) {
     return Container();
   }

@@ -10,7 +10,7 @@ class BalanceWidget extends StatefulWidget {
 }
 
 class _BalanceState extends State<BalanceWidget> {
-  Future<Balance> balance;
+  Future<UserBalance> balance;
 
   @override
   void initState() {
@@ -20,8 +20,8 @@ class _BalanceState extends State<BalanceWidget> {
 
   var random = new Random();
 
-  Future<Balance> getBalance() {
-    return Future.value(Balance(nwc: 10000, usd: 500));
+  Future<UserBalance> getBalance() {
+    return Future.value(UserBalance(nwc: 10000, usd: 500));
   }
 
   @override
@@ -30,7 +30,7 @@ class _BalanceState extends State<BalanceWidget> {
         future: balance,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
-            Balance loaded = snapshot.data;
+            UserBalance loaded = snapshot.data;
             return Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor,
