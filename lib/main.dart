@@ -15,7 +15,7 @@ import 'package:newscrypto_wallet/services/PriceHistoryService.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Fab.dart';
 import 'package:newscrypto_wallet/widgets/TransfareButton.dart';
-import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart' as stellar;
+
 import 'models/Price.dart';
 import 'models/Trnsaction.dart';
 
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: FutureBuilder<String>(
-          future: getStartScreen(),
+          future: AccountApi().getStartScreen(),
           builder: (context, AsyncSnapshot<String> snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data.isEmpty)
@@ -56,7 +56,6 @@ class MyApp extends StatelessWidget {
               else
                 return StartWizard();
             } else {
-              print("no data");
               return StartWizard();
             }
           }),
@@ -109,7 +108,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
 
   @override
   void initState() {
-    createNewNWCTrustLine();
+    AccountApi().createNewNWCTrustLine();
     _controller.addListener(() {
       var isEnd = _controller.offset == _controller.position.maxScrollExtent;
       if (isEnd) {
@@ -135,8 +134,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
   Future<void> refreshTransactions() async {
     _future = loadNewData();
 
-    double nwcBalance = await getAccountBalance();
-    Statistics nwcPrice = await fetchStats();
+    double nwcBalance = await AccountApi().getAccountBalance();
+    Statistics nwcPrice = await PriceApi().fetchStats();
     setState(() {
       statistics = nwcPrice;
       balance =
@@ -147,7 +146,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
 
   Future<List<WalletTransaction>> getTransactions(var cursor) async {
     List<WalletTransaction> walletTransaction =
-        await getAccountTransactions(cursor);
+        await AccountApi().getAccountTransactions(cursor);
     return walletTransaction;
   }
 
@@ -157,6 +156,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
       cursor = _data[_data.length - 1].paginationToken;
     }
     var tracks = await getTransactions(cursor);
+
+    print(tracks.length);
     _data.addAll(tracks);
     return _data;
   }
@@ -167,7 +168,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
       cursor = _data[0].paginationToken;
     }
     List<WalletTransaction> walletTransaction =
-        await getAccountNewTransactions(cursor);
+        await AccountApi().getAccountNewTransactions(cursor);
     for (var transaction in walletTransaction) {
       _data.insert(0, transaction);
     }
@@ -189,7 +190,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
             return false;
           },
           child: CustomScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             controller: _controller,
             slivers: [
               SliverAppBar(
@@ -344,9 +346,9 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
   }
 
   void loadBalance() async {
-    double nwcBalance = await getAccountBalance();
-    Statistics nwcPrice = await fetchStats();
-
+    double nwcBalance = await AccountApi().getAccountBalance();
+    Statistics nwcPrice = await PriceApi().fetchStats();
+    print(nwcPrice.buy);
     setState(() {
       statistics = nwcPrice;
       balance =
@@ -359,7 +361,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
         (DateTime.now().subtract(Duration(days: 14)).millisecondsSinceEpoch /
                 1000)
             .round();
-    List<PriceHistory> _data = await fetchPriceHistory(startAt, "1day");
+    List<PriceHistory> _data =
+        await PriceApi().fetchPriceHistory(startAt, "1day");
     setState(() {
       prices = _data;
     });

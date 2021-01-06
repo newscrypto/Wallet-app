@@ -34,8 +34,8 @@ class _ConfirmSendState extends State<ConfirmSend> {
       _confirm = false;
       _loading = true;
     });
-    bool response = await sendNWC(
-        widget.sendToAddress, widget.sendToMemo, widget.sendAmountNWC);
+    bool response = await AccountApi()
+        .sendNWC(widget.sendToAddress, widget.sendToMemo, widget.sendAmountNWC);
     if (response) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => SliverAppBarSnap()),
@@ -170,7 +170,8 @@ class _ConfirmSendState extends State<ConfirmSend> {
                   height: MediaQuery.of(context).size.width * 0.6,
                   child: CircularProgressIndicator(
                     strokeWidth: 10,
-                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primaryButtonDefault),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Palette.primaryButtonDefault),
                   ),
                 ),
               ),

@@ -28,7 +28,7 @@ class _ReceiveState extends State<Receive> {
   }
 
   void loadAccountId() async {
-    String newAccountId = await getAccountID();
+    String newAccountId = await AccountApi().getAccountID();
     setState(() {
       accountId = newAccountId;
     });

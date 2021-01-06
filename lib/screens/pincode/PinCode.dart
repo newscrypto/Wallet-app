@@ -54,7 +54,7 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen>
       });
 
     if (currentText.length == 6) {
-      await setPin(currentText);
+      await AccountApi().setPin(currentText);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => NewPin()),
@@ -91,9 +91,7 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen>
                   children: <Widget>[
                     FlatButton(
                       child: Text(""),
-                      onPressed: () {
-                        currentText = "123456";
-                      },
+                      onPressed: () {},
                     ),
                     Opacity(
                       opacity: currentText.isNotEmpty ? 1 : 0,

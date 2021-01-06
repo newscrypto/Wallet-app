@@ -19,11 +19,6 @@ class FabWidget extends StatefulWidget {
 class FabWidgetState extends State<FabWidget> with TickerProviderStateMixin {
   AnimationController _controller;
 
-  static const List<IconData> icons = const [
-    Icons.call_received,
-    Icons.call_made
-  ];
-
   @override
   void initState() {
     _controller = new AnimationController(
@@ -48,14 +43,14 @@ class FabWidgetState extends State<FabWidget> with TickerProviderStateMixin {
           child: new ScaleTransition(
             scale: new CurvedAnimation(
               parent: _controller,
-              curve: new Interval(0.0, 1.0 - 0 / icons.length / 2.0,
-                  curve: Curves.easeOut),
+              curve:
+                  new Interval(0.0, 1.0 - 0 / 2 / 2.0, curve: Curves.easeOut),
             ),
             child: new FloatingActionButton(
               heroTag: null,
               backgroundColor: backgroundColor,
               mini: true,
-              child: new Icon(icons[0], color: foregroundColor),
+              child: Icon(Icons.call_received, color: foregroundColor),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -72,14 +67,14 @@ class FabWidgetState extends State<FabWidget> with TickerProviderStateMixin {
           child: new ScaleTransition(
             scale: new CurvedAnimation(
               parent: _controller,
-              curve: new Interval(0.0, 1.0 - 1 / icons.length / 2.0,
-                  curve: Curves.easeOut),
+              curve:
+                  new Interval(0.0, 1.0 - 1 / 2 / 2.0, curve: Curves.easeOut),
             ),
             child: new FloatingActionButton(
               heroTag: null,
               backgroundColor: backgroundColor,
               mini: true,
-              child: new Icon(icons[1], color: foregroundColor),
+              child: Icon(Icons.call_made, color: foregroundColor),
               onPressed: () {
                 Navigator.push(
                   context,

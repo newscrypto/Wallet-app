@@ -51,7 +51,7 @@ class _NewPinState extends State<NewPin> with SingleTickerProviderStateMixin {
       });
 
     if (currentText.length == 6) {
-      bool pinOk = await comparePin(currentText);
+      bool pinOk = await AccountApi().comparePin(currentText);
       if (pinOk)
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => SliverAppBarSnap()),

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:newscrypto_wallet/models/Activation.dart';
-import 'package:newscrypto_wallet/screens/pincode/PinCode.dart';
+import 'package:newscrypto_wallet/screens/SecretKeyPage.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/services/Activation.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
@@ -37,11 +37,11 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
   }
 
   void generateNewWallet() async {
-    String address = await createNewWallet();
+    String address = await  AccountApi().createNewWallet();
     setState(() {
       _publicKey = address;
     });
-    ActivationInfo newActivationInfo = await fetchActivationInfo(_publicKey);
+    ActivationInfo newActivationInfo = await ActivationApi().fetchActivationInfo(_publicKey);
     setState(() {
       _activationInfo = newActivationInfo;
     });
@@ -51,16 +51,16 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
     setState(() {
       _loading = true;
     });
-    ActivationInfo newActivationInfo = await fetchActivationInfo(_publicKey);
+    ActivationInfo newActivationInfo = await ActivationApi().fetchActivationInfo(_publicKey);
     if (newActivationInfo.activated) {
-      setActivate(true);
-      bool trustline = await createNWCTrustLine();
+      AccountApi().setActivate(true);
+      bool trustline = await  AccountApi().createNWCTrustLine();
       if (trustline) {
-        getChange(_publicKey);
+        ActivationApi().getChange(_publicKey);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PinCodeVerificationScreen(),
+            builder: (context) => SecretKeyPage(),
           ),
         );
       }

@@ -25,16 +25,14 @@ class Statistics {
 
   factory Statistics.fromJson(Map<String, dynamic> json) {
     return Statistics(
-      last: double.parse(json["last"]),
-      changePrice: double.parse(json["changePrice"]),
-      changeRate: double.parse(json["changeRate"]),
-      high: double.parse(json["high"]),
-      low: double.parse(json["low"]),
-      vol: double.parse(json["vol"]),
-      volValue: double.parse(json["volValue"]),
-      averagePrice: double.parse(json["averagePrice"]),
-      buy: double.parse(json["buy"]),
-      sell: double.parse(json["sell"]),
+      last: json["last"] != null ? double.parse(json["last"]) : 0,
+      changePrice: json["changePrice"] != null ? double.parse(json["changePrice"]) : 0,
+      changeRate: json["changeRate"] != null ? double.parse(json["changeRate"]) : 0,
+      high: json["high"] != null ? double.parse(json["high"]) : 0,
+      low: json["low"] != null ? double.parse(json["low"]) : 0,
+      vol: json["vol"] != null ? double.parse(json["vol"]) : 0,
+      buy: json["buy"] != null ? double.parse(json["buy"]) : 0,
+      sell: json["sell"] != null ? double.parse(json["sell"]) : 0,
     );
   }
 }

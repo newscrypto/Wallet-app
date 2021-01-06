@@ -7,20 +7,28 @@ import 'package:newscrypto_wallet/widgets/Background.dart';
 import 'package:newscrypto_wallet/widgets/Logo.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 
-class Import extends StatefulWidget {
+class SecretKeyPage extends StatefulWidget {
   @override
-  _ImportState createState() => _ImportState();
+  _SecretKeyState createState() => _SecretKeyState();
 }
 
-class _ImportState extends State<Import> with TickerProviderStateMixin {
+class _SecretKeyState extends State<SecretKeyPage> {
   bool nwcAddressPasted = false;
   bool nwcMemoPasted = false;
-  String secretKey = "Tap to paste secret key!";
+  String secretKey = "";
   String errorText = "";
 
   @override
   void initState() {
     super.initState();
+    loadSecretKey();
+  }
+
+  void loadSecretKey() async {
+    String secret = await AccountApi().getAccountSecret();
+    setState(() {
+      secretKey = secret;
+    });
   }
 
   @override
@@ -51,11 +59,16 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                       child: Logo(),
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: MediaQuery.of(context).size.width * 0.1),
-                      child: Text("Secret key:"),
-                    ),
+                        margin: EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.1),
+                        child: Center(
+                          child: Text(
+                            "Save secret key for recovering wallet:",
+                            textAlign: TextAlign.center,
+                          ),
+                        )),
                     Container(
                       margin: EdgeInsets.symmetric(
                           vertical: 5,
@@ -66,10 +79,9 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(10),
                         color: Theme.of(context).primaryColor,
                       ),
-                      child: TextField(
-                        onChanged: (value) {
-                          secretKey = value;
-                        },
+                      child: Text(
+                        secretKey,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Container(
@@ -82,7 +94,7 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                       child: Text(errorText),
                     ),
                     SecondaryButton(
-                      title: "Import wallet",
+                      title: "Next",
                       margin: EdgeInsets.only(
                         top: 10,
                         bottom: 40,
@@ -93,19 +105,12 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                       color: Palette.secondaryButtonDefault,
                       fontsize: 20,
                       function: () async {
-                        try {
-                          await AccountApi().importNewWallet(secretKey);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PinCodeVerificationScreen(),
-                            ),
-                          );
-                        } catch (e) {
-                          setState(() {
-                            errorText = e;
-                          });
-                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PinCodeVerificationScreen(),
+                          ),
+                        );
                       },
                     ),
                   ],

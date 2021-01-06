@@ -189,7 +189,7 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                               ClipboardData clipboard =
                                   await Clipboard.getData(Clipboard.kTextPlain);
                               bool validAddress =
-                                  await checkAddress(clipboard.text);
+                                  await  AccountApi().checkAddress(clipboard.text);
                               print(validAddress);
                               if (validAddress) {
                                 setState(() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newscrypto_wallet/screens/changePin/ChnagePin.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +38,7 @@ class _SettingsState extends State<Settings> {
   }
 
   void loadSecretKey() async {
-    String secret = await getAccountSecret();
+    String secret = await AccountApi().getAccountSecret();
     setState(() {
       secretKey = secret;
     });
@@ -93,12 +94,20 @@ class _SettingsState extends State<Settings> {
                 height: 20,
                 thickness: 1,
               ),
-              Container(
-                padding: EdgeInsets.only(top: 15, bottom: 15),
-                child: Text(
-                  "Change PIN",
-                ),
-              ),
+              GestureDetector(
+                  onTap: () {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ChangePinCodeScreen()),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.only(top: 15, bottom: 15),
+                    child: Text(
+                      "Change PIN",
+                    ),
+                  )),
               const Divider(
                 color: Colors.black54,
                 height: 20,
@@ -112,6 +121,7 @@ class _SettingsState extends State<Settings> {
                   ),
                 ),
                 onTap: () {
+                  print(secretKey);
                   setState(() {
                     isSecretVisible = !isSecretVisible;
                   });

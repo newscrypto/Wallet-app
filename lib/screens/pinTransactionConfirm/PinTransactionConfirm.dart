@@ -53,7 +53,7 @@ class _PinTransactionConfirmState extends State<PinTransactionConfirm>
       });
 
     if (currentText.length == 6) {
-      bool pinOk = await comparePin(currentText);
+      bool pinOk = await AccountApi().comparePin(currentText);
       if (pinOk) {
         widget.onComplete();
       } else {
