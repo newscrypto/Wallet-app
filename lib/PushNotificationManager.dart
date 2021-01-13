@@ -28,7 +28,8 @@ class PushNotificationsManager {
   bool _initialized = false;
 
   _handleMessage(data) {
-    Message message = Message.fromJson(data);
+    var received = data['data'] ?? data;
+    Message message = Message.fromJson(received);
     if (message.status == "url" && message.url != null) {
       _launchURL(message.url);
     }
