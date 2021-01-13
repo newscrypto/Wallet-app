@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:newscrypto_wallet/PushNotificationManager.dart';
 import 'package:newscrypto_wallet/screens/NewWallet.dart';
 import 'package:newscrypto_wallet/screens/import/Import.dart';
 import 'package:newscrypto_wallet/screens/pincode/PinCode.dart';
