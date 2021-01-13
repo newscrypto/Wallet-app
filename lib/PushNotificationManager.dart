@@ -49,7 +49,6 @@ class PushNotificationsManager {
       _firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
           print("onMessage: $message");
-          _handleMessage(message);
         },
         onLaunch: (Map<String, dynamic> message) async {
           print("onLaunch: $message");
