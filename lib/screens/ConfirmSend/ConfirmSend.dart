@@ -3,6 +3,7 @@ import 'package:newscrypto_wallet/screens/pinTransactionConfirm/PinTransactionCo
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
+import 'package:newscrypto_wallet/widgets/BackgroundSecondary.dart';
 import 'package:newscrypto_wallet/widgets/PrimaryButton.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 
@@ -61,18 +62,17 @@ class _ConfirmSendState extends State<ConfirmSend> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          BackgroundStack(),
+          BackgroundSecondaryStack(),
           Center(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).primaryColor,
+                    color: Palette.input,
                   ),
                   padding: EdgeInsets.all(15),
                   child: Column(
@@ -104,7 +104,7 @@ class _ConfirmSendState extends State<ConfirmSend> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).primaryColor,
+                    color: Palette.input,
                   ),
                   padding: EdgeInsets.all(15),
                   child: Text(
@@ -120,7 +120,7 @@ class _ConfirmSendState extends State<ConfirmSend> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).primaryColor,
+                    color: Palette.input,
                   ),
                   padding: EdgeInsets.all(15),
                   child: Text(
@@ -129,21 +129,21 @@ class _ConfirmSendState extends State<ConfirmSend> {
                   ),
                 ),
                 // ),
-                PrimaryButton(
-                    title: "Confirm",
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    fontsize: 20,
-                    margin: EdgeInsets.only(top: 40, bottom: 10),
-                    padding: EdgeInsets.all(20),
-                    function: () async {
-                      setState(() {
-                        _confirm = true;
-                      });
-                    }),
+                Center(
+                  child: SecondaryButton(
+                      title: "Confirm",
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      margin: EdgeInsets.only(top: 40, bottom: 10),
+                      function: () async {
+                        setState(() {
+                          _confirm = true;
+                        });
+                      }),
+                ),
                 SecondaryButton(
                   title: "Cancel",
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  fontsize: 20,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  isTransparent: true,
                   margin: EdgeInsets.only(
                     top: 5,
                   ),

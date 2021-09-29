@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Price.dart';
+import 'package:newscrypto_wallet/utils/Palete.dart';
 
 Widget chart(BuildContext context, List<PriceHistory> prices, UserBalance balance,
     var maxHeight, Animation<double> animation) {
@@ -26,6 +27,7 @@ Widget chart(BuildContext context, List<PriceHistory> prices, UserBalance balanc
             onMissingValue: (dateTime) {
               return prices[0].price;
             },
+            lineColor: Palette.blue,
             data: prices
                 .map((e) => DataPoint<DateTime>(value: e.price, xAxis: e.date))
                 .toList()),

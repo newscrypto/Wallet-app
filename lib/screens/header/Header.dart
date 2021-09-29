@@ -3,6 +3,7 @@ import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Price.dart';
 import 'package:newscrypto_wallet/screens/Settings/Settings.dart';
 import 'package:newscrypto_wallet/screens/header/widgets/Chart.dart';
+import 'package:newscrypto_wallet/utils/Palete.dart';
 
 class HeaderState extends StatelessWidget {
   final double maxHeight;
@@ -26,8 +27,8 @@ class HeaderState extends StatelessWidget {
         return SafeArea(
           child: Stack(
             children: [
-              _buildGradient(animation),
-              _buildTitle(animation),
+              // _buildGradient(animation),
+              _buildTitle(animation, expandRatio),
 
               Align(
                   alignment: Alignment.topCenter,
@@ -50,14 +51,22 @@ class HeaderState extends StatelessWidget {
                 ),
               ),
 
-//                    child: Container(
-//                      width: MediaQuery.of(context).size.width * 0.90,
-//                      height: maxHeight - 100,
-//                      margin: EdgeInsets.only(top: 50),
-//                      child: prices != null && prices.isNotEmpty
-//                          ? GridlineDashPattern.withSampleData(prices)
-//                          : Container(),
-//                    ))),
+                   // child: Container(
+                   //   width: MediaQuery.of(context).size.width * 0.90,
+                   //   height: maxHeight - 100,
+                   //   margin: EdgeInsets.only(top: 50),
+                   //   child: prices != null && prices.isNotEmpty
+                   //       ? GridlineDashPattern.withSampleData(prices)
+                   //       : Container(),
+                   // ))),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 2,
+                  color: Colors.white30,
+                ),
+              ),
             ],
           ),
         );
@@ -73,7 +82,55 @@ class HeaderState extends StatelessWidget {
     return expandRatio;
   }
 
-  Align _buildTitle(Animation<double> animation) {
+  Align _buildTitle(Animation<double> animation, expandRatio) {
+    if (balance.nwc < 100000)
+      return Align(
+        alignment: AlignmentTween(
+                begin: Alignment.bottomLeft, end: Alignment.bottomLeft)
+            .evaluate(animation),
+        child: Container(
+            margin: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Text(
+                  "Balance:",
+                  style: TextStyle(
+                    fontSize:
+                        Tween<double>(begin: 10, end: 16).evaluate(animation),
+                    color: Palette.blue,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "${balance.nwc.toStringAsFixed(2)} NWC",
+                      style: TextStyle(
+                        fontSize: Tween<double>(begin: 12, end: 18)
+                            .evaluate(animation),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      "${balance.usd.toStringAsFixed(2)} USD",
+                      style: TextStyle(
+                        fontSize: Tween<double>(begin: 12, end: 18)
+                            .evaluate(animation),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            )),
+      );
+
     return Align(
       alignment:
           AlignmentTween(begin: Alignment.bottomLeft, end: Alignment.bottomLeft)
@@ -89,54 +146,63 @@ class HeaderState extends StatelessWidget {
                 "Balance:",
                 style: TextStyle(
                   fontSize:
-                      Tween<double>(begin: 14, end: 24).evaluate(animation),
+                      Tween<double>(begin: 10, end: 13).evaluate(animation),
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    "${balance.nwc.toStringAsFixed(2)} NWC",
-                    style: TextStyle(
-                      fontSize:
-                          Tween<double>(begin: 12, end: 18).evaluate(animation),
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
+              Text(
+                "${balance.nwc.toStringAsFixed(2)} NWC",
+                style: TextStyle(
+                  fontSize:
+                      Tween<double>(begin: 12, end: 15).evaluate(animation),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Visibility(
+                  visible: expandRatio > 0.4,
+                  child: Opacity(
+                    opacity: expandRatio,
+                    child: Text(
+                      "${balance.usd.toStringAsFixed(2)} USD",
+                      style: TextStyle(
+                        fontSize: Tween<double>(begin: 12, end: 15)
+                            .evaluate(animation),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  Text(
-                    "${balance.usd.toStringAsFixed(2)} USD",
-                    style: TextStyle(
-                      fontSize:
-                          Tween<double>(begin: 12, end: 18).evaluate(animation),
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              )
+                  ))
             ],
           )),
     );
   }
 
-  Container _buildGradient(Animation<double> animation) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.transparent,
-            ColorTween(begin: Colors.black26, end: Colors.black54)
-                .evaluate(animation)
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-    );
-  }
+// Container _buildGradient(Animation<double> animation) {
+//   return Container(
+//     decoration: BoxDecoration(
+//       color: Colors.black,
+//       // gradient: LinearGradient(
+//       //   colors: [
+//       //     Colors.transparent,
+//       //     ColorTween(begin: Colors.black26, end: Colors.black54)
+//       //         .evaluate(animation)
+//       //   ],
+//       //   begin: Alignment.ion: BoxDecoration(
+//       //     //   // gradient: LinearGradient(
+//       //     //   //   colors: [
+//       //     //   //     Colors.transparent,
+//       //     //   //     ColorTween(begin: Colors.black26, end: Colors.black54)
+//       //     //   //         .evaluate(animation)
+//       //     //   //   ],
+//       //     //     begin: Alignment.topCenter,
+//       //     //     end: Alignment.bottomCenter,
+//       //     //   ),topCenter,
+//       //   end: Alignment.bottomCenter,
+//     ),
+//   );
+// }
 
 //  Widget _buildImage(BuildContext context) {
 //    return Container(

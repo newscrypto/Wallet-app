@@ -50,4 +50,30 @@ class WalletTransaction {
       dateTime: DateTime.parse(payment.createdAt),
     );
   }
+
+  get addressFormat {
+    var text = received ? "From: " : "To: ";
+    var address = received ? from : to;
+    var start = address.substring(0, 7);
+    var end = address.substring(address.length - 7);
+    return '$text$start...$end';
+  }
+
+  get hashFormat {
+    var start = hash.substring(0, 7);
+    var end = hash.substring(hash.length - 7);
+    return '$start...$end';
+  }
+
+  get type {
+    return received ? "Received" : "Send";
+  }
+
+  get url {
+    return 'https://stellar.expert/explorer/public/tx/${id - 1}';
+  }
+
+  get icon {
+    return received ? "deposit" : "withdraw";
+  }
 }

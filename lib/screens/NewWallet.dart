@@ -8,6 +8,7 @@ import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/services/Activation.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
+import 'package:newscrypto_wallet/widgets/PrimaryButton.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -37,11 +38,12 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
   }
 
   void generateNewWallet() async {
-    String address = await  AccountApi().createNewWallet();
+    String address = await AccountApi().createNewWallet();
     setState(() {
       _publicKey = address;
     });
-    ActivationInfo newActivationInfo = await ActivationApi().fetchActivationInfo(_publicKey);
+    ActivationInfo newActivationInfo =
+        await ActivationApi().fetchActivationInfo(_publicKey);
     setState(() {
       _activationInfo = newActivationInfo;
     });
@@ -51,10 +53,11 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
     setState(() {
       _loading = true;
     });
-    ActivationInfo newActivationInfo = await ActivationApi().fetchActivationInfo(_publicKey);
+    ActivationInfo newActivationInfo =
+        await ActivationApi().fetchActivationInfo(_publicKey);
     if (newActivationInfo.activated) {
       AccountApi().setActivate(true);
-      bool trustline = await  AccountApi().createNWCTrustLine();
+      bool trustline = await AccountApi().createNWCTrustLine();
       if (trustline) {
         ActivationApi().getChange(_publicKey);
         Navigator.push(
@@ -74,22 +77,21 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double fontsize = width > 370 ? 20 : 16;
+    double fontsize = width > 370 ? 12 : 10;
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Receive"),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[Colors.transparent, Colors.black26])),
-        ),
-      ),
+      // appBar: AppBar(
+      //   centerTitle: true,
+      //   title: Text("Receive"),
+      //   backgroundColor: Colors.transparent,
+      //   flexibleSpace: Container(
+      //     decoration: BoxDecoration(
+      //       color: Colors.transparent,
+      //     ),
+      //   ),
+      // ),
       backgroundColor: Theme.of(context).primaryColor,
-      body: Stack(
+      body:
+      Stack(
         children: [
           BackgroundStack(),
           Center(
@@ -101,26 +103,27 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: Text(
-                      "To activate your wallet, send at least ${_activationInfo.amount} NWC to the address listed below with the provided memo. The remaining funds will be automatically transferred to your new wallet after creation.",
+                      "To activate your wallet, send at least ${_activationInfo.amount} NWC to the address listed below with the provided memo. \n\n The remaining funds will be automatically transferred to your new wallet after creation.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 15),
                     ),
-                    margin: EdgeInsets.only(bottom: 30),
+                    margin: EdgeInsets.only(bottom: 30, top: 50),
                   ),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).primaryColor,
+                      // color: Theme.of(context).primaryColor,
                     ),
                     padding: EdgeInsets.all(5),
                     child: QrImage(
                       data: _activationInfo.address,
                       version: QrVersions.auto,
-                      size: MediaQuery.of(context).size.width * 0.4,
+                      size: MediaQuery.of(context).size.width * 0.5,
                       gapless: false,
-                      embeddedImage: AssetImage('assets/images/logo.png'),
+                      embeddedImage:
+                          AssetImage('assets/images/logo-with-bg.png'),
                       embeddedImageStyle: QrEmbeddedImageStyle(
-                        size: Size(20, 20),
+                        size: Size(40, 40),
                       ),
                       foregroundColor: Colors.white,
                     ),
@@ -151,7 +154,7 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                       width: MediaQuery.of(context).size.width * 0.8,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.white12,
                       ),
                       padding: EdgeInsets.all(20),
                       margin: EdgeInsets.symmetric(horizontal: 30),
@@ -188,7 +191,7 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                       width: MediaQuery.of(context).size.width * 0.8,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.white12,
                       ),
                       padding: EdgeInsets.all(20),
                       margin: EdgeInsets.symmetric(horizontal: 30),
@@ -206,15 +209,14 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                     ),
                     margin: EdgeInsets.only(top: 10, bottom: 10),
                   ),
-                  SecondaryButton(
+
+                  PrimaryButton(
                     title: "Activate",
-                    width: MediaQuery.of(context).size.width * 0.8,
+                    width: width * 0.7,
                     fontsize: fontsize,
-                    margin: EdgeInsets.only(top: 5),
-                    color: Palette.primaryButtonDefault,
-                    function: () {
-                      getActivationInfo();
-                    },
+                    margin: EdgeInsets.only(top: 10, bottom: 40),
+                    padding: EdgeInsets.all(15),
+                    function: getActivationInfo,
                   ),
                 ],
               ),

@@ -58,7 +58,9 @@ class AccountApi {
   Future<String> getStartScreen() async {
     bool login = await isLoginPin();
     bool activated = await isActivated();
+    bool isPinSet = (await getPin()) != "";
     if (!activated) return "startScreen";
+    if (!isPinSet) return "pinSetup";
     if (login) return "login";
     return "transactions";
   }
@@ -131,6 +133,11 @@ class AccountApi {
     prefs.setString(PIN_CODE_KEY, pinCode);
   }
 
+  Future<String> getPin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(PIN_CODE_KEY) ?? "";
+  }
+
   Future<bool> comparePin(String pinCode) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String pin = prefs.getString(PIN_CODE_KEY);
@@ -197,15 +204,14 @@ class AccountApi {
     for (OperationResponse response in payments.records) {
       if (response is PaymentOperationResponse) {
         PaymentOperationResponse por = response;
-        if (por.transactionSuccessful &&
-            por.assetCode == "NWC" &&
-            por.to.accountId != issuerKey &&
-            por.from.accountId != distribution) {
+        if (por.transactionSuccessful && por.assetCode == "NWC") {
+          print("transactions added");
           transactions
               .add(new WalletTransaction.fromPaymentOperation(por, accountId));
         }
       }
     }
+    print(transactions);
     return transactions;
   }
 

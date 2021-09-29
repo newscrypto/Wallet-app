@@ -9,16 +9,25 @@ class PrimaryButton extends StatelessWidget {
   final EdgeInsets margin;
   final EdgeInsets padding;
 
-  PrimaryButton({this.title, this.fontsize, this.function, this.width, this.margin, this.padding});
+  PrimaryButton(
+      {this.title,
+      this.fontsize,
+      this.function,
+      this.width,
+      this.margin,
+      this.padding});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: width,
       margin: margin,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(8)),
+      ),
       child: MaterialButton(
-        color: Palette.primaryButtonDefault,
-        textColor: Theme.of(context).primaryColor,
+        color: Colors.white,
+        textColor: Palette.blue,
         padding: padding,
         child: Text(
           title,

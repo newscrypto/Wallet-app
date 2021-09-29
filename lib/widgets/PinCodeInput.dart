@@ -13,6 +13,7 @@ class PinInput extends StatelessWidget {
       circles.add(Container(
         width: 30,
         height: 30,
+        margin: EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(30)),
             color: inputLength - 1 >= i ? Colors.white70 : Colors.transparent,
@@ -27,13 +28,13 @@ class PinInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return Container(
+        child: Column(children: [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Text(
           title,
-          style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 22),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
           textAlign: TextAlign.center,
         ),
       ),
@@ -41,9 +42,9 @@ class PinInput extends StatelessWidget {
         height: 20,
       ),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: _pinCodeCircles(),
       )
-    ]);
+    ]));
   }
 }

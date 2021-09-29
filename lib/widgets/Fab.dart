@@ -5,6 +5,7 @@ import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Statistics.dart';
 import 'package:newscrypto_wallet/screens/receive/Receive.dart';
 import 'package:newscrypto_wallet/screens/send/Send.dart';
+import 'package:newscrypto_wallet/utils/Palete.dart';
 
 class FabWidget extends StatefulWidget {
   final Statistics statistic;
@@ -29,7 +30,7 @@ class FabWidgetState extends State<FabWidget> with TickerProviderStateMixin {
   }
 
   Widget build(BuildContext context) {
-    Color backgroundColor = Colors.blue;
+    Color backgroundColor = Palette.blue;
     Color foregroundColor = Theme.of(context).accentColor;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:newscrypto_wallet/screens/SecretKeyPage.dart';
 import 'package:newscrypto_wallet/screens/changePin/ChnagePin.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
+import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
+import 'package:newscrypto_wallet/widgets/BackgroundSecondary.dart';
+import 'package:newscrypto_wallet/widgets/get_toggle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
@@ -65,84 +69,87 @@ class _SettingsState extends State<Settings> {
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(children: [
-        BackgroundStack(),
+        BackgroundSecondaryStack(),
         Container(
-          margin: EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            margin: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("PIN lock"),
-                  Switch(
-                    value: pinBalanceSwitch,
-                    onChanged: (value) {
-                      setPinSetting(value);
+                  Container(
+                    height: 20,
+                  ),
+                  Container(
+                    child: Text(
+                      "PIN lock".toUpperCase(),
+                    ),
+                    margin: EdgeInsets.only(bottom: 10),
+                  ),
+                  ZAnimatedToggle(
+                    onToggleCallback: (value) {
                       setState(() {
-                        pinBalanceSwitch = value;
+                        pinBalanceSwitch = !pinBalanceSwitch;
                       });
+                      setPinSetting(pinBalanceSwitch);
                     },
-                    activeTrackColor: Colors.lightGreenAccent,
-                    activeColor: Colors.green,
+                    values: ["OFF", "ON"],
+                    value: !pinBalanceSwitch,
+                  ),
+                  _getButton(
+                    "Change PIN".toUpperCase(),
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChangePinCodeScreen()),
+                      );
+                    },
+                  ),
+                  _getButton(
+                    "Show secret key".toUpperCase(),
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SecretKeyPage(backButton: true,)),
+                      );
+                    },
+                  ),
+                  Visibility(
+                    visible: isSecretVisible,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      padding: EdgeInsets.all(15),
+                      child: Text(
+                        secretKey,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const Divider(
-                color: Colors.black54,
-                height: 20,
-                thickness: 1,
-              ),
-              GestureDetector(
-                  onTap: () {
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChangePinCodeScreen()),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.only(top: 15, bottom: 15),
-                    child: Text(
-                      "Change PIN",
-                    ),
-                  )),
-              const Divider(
-                color: Colors.black54,
-                height: 20,
-                thickness: 1,
-              ),
-              GestureDetector(
-                child: Container(
-                  padding: EdgeInsets.only(top: 15, bottom: 15),
-                  child: Text(
-                    "Show secret key",
-                  ),
-                ),
-                onTap: () {
-                  print(secretKey);
-                  setState(() {
-                    isSecretVisible = !isSecretVisible;
-                  });
-                },
-              ),
-              Visibility(
-                visible: isSecretVisible,
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  padding: EdgeInsets.all(15),
-                  child: Text(
-                    secretKey,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
+            ))
       ]),
+    );
+  }
+
+  Widget _getButton(String text, onPress) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      margin: EdgeInsets.only(top: 20),
+      decoration: BoxDecoration(
+          color: Palette.input,
+          borderRadius: BorderRadius.all(Radius.circular(8))),
+      child: MaterialButton(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: onPress,
+      ),
     );
   }
 }

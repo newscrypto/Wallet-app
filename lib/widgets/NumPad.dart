@@ -6,7 +6,7 @@ class NumPad extends StatelessWidget {
   final Function(String number) onNumberTap;
 
   List<Widget> _createButtons(int start, int end) {
-    List<Widget> buttons = new List();
+    List<Widget> buttons = [];
     for (int i = start; i <= end; i++) {
       buttons.add(NumberButton(
         name: i.toString(),
@@ -26,19 +26,19 @@ class NumPad extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: _createButtons(1, 3),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: _createButtons(4, 6),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: _createButtons(7, 9),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: _createButtons(0, 0),
           ),
         ],

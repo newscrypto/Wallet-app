@@ -5,6 +5,7 @@ import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
 import 'package:newscrypto_wallet/widgets/Logo.dart';
+import 'package:newscrypto_wallet/widgets/PrimaryButton.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 
 class Import extends StatefulWidget {
@@ -39,6 +40,10 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
           children: [
             BackgroundStack(),
             Align(
+              alignment: Alignment.center,
+              child: Logo(),
+            ),
+            Align(
               alignment: Alignment.bottomCenter,
               child: SingleChildScrollView(
                 physics: ClampingScrollPhysics(),
@@ -46,10 +51,7 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Align(
-                      alignment: Alignment.center,
-                      child: Logo(),
-                    ),
+
                     Container(
                       margin: EdgeInsets.symmetric(
                           vertical: 5,
@@ -64,7 +66,7 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                           EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.white12,
                       ),
                       child: TextField(
                         onChanged: (value) {
@@ -79,34 +81,35 @@ class _ImportState extends State<Import> with TickerProviderStateMixin {
                         left: MediaQuery.of(context).size.width * 0.1,
                         right: MediaQuery.of(context).size.width * 0.1,
                       ),
-                      child: Text(errorText),
-                    ),
-                    SecondaryButton(
-                      title: "Import wallet",
-                      margin: EdgeInsets.only(
-                        top: 10,
-                        bottom: 40,
-                        left: MediaQuery.of(context).size.width * 0.1,
-                        right: MediaQuery.of(context).size.width * 0.1,
+                      child: Text(
+                        errorText,
+                        style: TextStyle(fontSize: 10),
                       ),
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      color: Palette.secondaryButtonDefault,
-                      fontsize: 20,
-                      function: () async {
-                        try {
-                          await AccountApi().importNewWallet(secretKey);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PinCodeVerificationScreen(),
-                            ),
-                          );
-                        } catch (e) {
-                          setState(() {
-                            errorText = e;
-                          });
-                        }
-                      },
+                    ),
+                    Center(
+                      child: PrimaryButton(
+                        title: "Import existing wallet",
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        fontsize: 12,
+                        margin: EdgeInsets.only(top: 10, bottom: 40),
+                        padding: EdgeInsets.all(15),
+                        function: () async {
+                          try {
+                            await AccountApi().importNewWallet(secretKey);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    PinCodeVerificationScreen(),
+                              ),
+                            );
+                          } catch (e) {
+                            setState(() {
+                              errorText = e;
+                            });
+                          }
+                        },
+                      ),
                     ),
                   ],
                 ),

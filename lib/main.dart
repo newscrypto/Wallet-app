@@ -11,13 +11,16 @@ import 'package:intl/intl.dart';
 import 'package:newscrypto_wallet/models/Balance.dart';
 import 'package:newscrypto_wallet/models/Statistics.dart';
 import 'package:newscrypto_wallet/screens/Login/Login.dart';
+import 'package:newscrypto_wallet/screens/SecretKeyPage.dart';
 import 'package:newscrypto_wallet/screens/header/Header.dart';
+import 'package:newscrypto_wallet/screens/pincode/PinCode.dart';
 import 'package:newscrypto_wallet/screens/start/StartWizard.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/services/PriceHistoryService.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Fab.dart';
 import 'package:newscrypto_wallet/widgets/TransfareButton.dart';
+import 'package:newscrypto_wallet/widgets/TrasactionContainer.dart';
 
 import 'PushNotificationManager.dart';
 import 'models/Price.dart';
@@ -47,31 +50,83 @@ class MyApp extends StatelessWidget {
       navigatorObservers: <NavigatorObserver>[observer],
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        primaryColor: Color(0xff26364F),
-        accentColor: Color(0xff3D4D66),
-        backgroundColor: Color(0xff3D4D66),
+        primaryColor: Color(0xff191415),
+        accentColor: Colors.white,
+        backgroundColor: Color(0xff191415),
         brightness: Brightness.dark,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
-      home: FutureBuilder<String>(
-          future: AccountApi().getStartScreen(),
-          builder: (context, AsyncSnapshot<String> snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data.isEmpty)
-                return StartWizard();
-              else if (snapshot.data == "startScreen")
-                return StartWizard();
-              else if (snapshot.data == "transactions")
-                return SliverAppBarSnap();
-              else if (snapshot.data == "login")
-                return Login();
-              else
-                return StartWizard();
-            } else {
-              return StartWizard();
-            }
-          }),
+      home: SplashScreenApp(),
+    );
+  }
+}
+
+class SplashScreenApp extends StatefulWidget {
+  @override
+  _SplashScreenAppState createState() => new _SplashScreenAppState();
+}
+
+class _SplashScreenAppState extends State<SplashScreenApp> {
+  loadFromFuture() async {
+    String screen = await AccountApi().getStartScreen();
+    Widget navigateTo;
+    switch (screen) {
+      case "startScreen":
+        navigateTo = StartWizard();
+        break;
+      case "pinSetup":
+        navigateTo = StartWizard();
+        break;
+
+      case "transactions":
+        navigateTo = SliverAppBarSnap();
+        break;
+
+      case "login":
+        navigateTo = Login();
+        break;
+      default:
+        navigateTo = StartWizard();
+    }
+    navigateTo =
+        await Future.delayed(const Duration(seconds: 1), () => navigateTo);
+    Navigator.of(context).pushReplacement(
+        new MaterialPageRoute(builder: (BuildContext context) => navigateTo));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadFromFuture();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              stops: [
+            0,
+            0.3,
+            1
+          ],
+              colors: [
+            Color(0xFF314C9F),
+            Color(0xFF314C9F),
+            Color(0xff32AFEA)
+          ])),
+      child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+              child: Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.width * 0.4,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                  )))),
     );
   }
 }
@@ -170,7 +225,6 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
     }
     var tracks = await getTransactions(cursor);
 
-    print(tracks.length);
     _data.addAll(tracks);
     return _data;
   }
@@ -211,6 +265,7 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
                 pinned: true,
                 stretch: true,
                 onStretchTrigger: refreshTransactions,
+                backgroundColor: Color(0xff191415),
                 flexibleSpace: HeaderState(
                   maxHeight: maxHeight,
                   minHeight: minHeight,
@@ -230,7 +285,8 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
                             if (index == 0 ||
                                 (loaded[index - 1].dateTime.day !=
                                     loaded[index].dateTime.day)) {
-                              return Column(
+                              return Center(
+                                  child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   if (index == 0 && _loadingNewTransactions)
@@ -256,11 +312,26 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
                                     child: Text(DateFormat.yMd()
                                         .format(loaded[index].dateTime)),
                                   ),
-                                  _buildCard(loaded[index], index)
+                                  Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    child: TransactionHistoryContainer(
+                                      transaction: loaded[index],
+                                    ),
+                                  )
                                 ],
-                              );
+                              ));
                             }
-                            return _buildCard(loaded[index], index);
+                            return Center(
+                              child: Container(
+                                  margin: EdgeInsets.only(top: 20),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: TransactionHistoryContainer(
+                                    transaction: loaded[index],
+                                  )),
+                            );
                           } else
                             return SliverFillRemaining(
                               hasScrollBody: false,

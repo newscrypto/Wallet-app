@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
+import 'package:newscrypto_wallet/widgets/BackgroundSecondary.dart';
 import 'package:newscrypto_wallet/widgets/Biometric.dart';
 import 'package:newscrypto_wallet/widgets/NumPad.dart';
 import 'package:newscrypto_wallet/widgets/PinCodeInput.dart';
@@ -72,7 +73,7 @@ class _PinTransactionConfirmState extends State<PinTransactionConfirm>
       key: scaffoldKey,
       body: Stack(
         children: [
-          BackgroundStack(),
+          BackgroundSecondaryStack(),
           BiometricAuth(onComplete: widget.onComplete),
           Center(
             child: Column(

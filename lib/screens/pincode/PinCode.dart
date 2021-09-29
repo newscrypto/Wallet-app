@@ -60,7 +60,6 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen>
         MaterialPageRoute(builder: (context) => NewPin()),
       );
     }
-    ;
   }
 
   @override
@@ -75,11 +74,14 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen>
             child: Column(
               children: <Widget>[
                 SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                Transform(
-                  transform: Matrix4.translation(_shake()),
-                  child: PinInput(
-                    inputLength: currentText.length,
-                    title: "Enter new pin code",
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Transform(
+                    transform: Matrix4.translation(_shake()),
+                    child: PinInput(
+                      inputLength: currentText.length,
+                      title: "Enter new pin code",
+                    ),
                   ),
                 ),
                 Spacer(),

@@ -7,6 +7,7 @@ import 'package:newscrypto_wallet/screens/ConfirmSend/ConfirmSend.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
+import 'package:newscrypto_wallet/widgets/BackgroundSecondary.dart';
 import 'package:newscrypto_wallet/widgets/PrimaryButton.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -63,7 +64,7 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: <Color>[Colors.transparent, Colors.black26])),
+                  colors: <Color>[Colors.transparent, Colors.transparent])),
         ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
@@ -76,11 +77,11 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
         },
         child: Stack(
           children: [
-            BackgroundStack(),
+            BackgroundSecondaryStack(),
             Center(
               child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
@@ -88,7 +89,7 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                       width: MediaQuery.of(context).size.width * 0.8,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).primaryColor,
+                        color: Palette.input,
                       ),
                       padding: EdgeInsets.all(15),
                       child: Row(
@@ -114,18 +115,20 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                                   children: <Widget>[
                                     Expanded(
                                       child: TextField(
-                                        keyboardType: TextInputType.number,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true),
                                         controller: _textController,
                                         textAlign: TextAlign.right,
                                         onChanged: (value) {
+                                          value = value.replaceAll(',', '.');
                                           setState(() {
                                             sendNWCAmount = double.parse(value);
-                                            sendUSDAmount =
-                                                double.parse(value) *
-                                                    widget.statistic.last;
+                                            sendUSDAmount = sendNWCAmount *
+                                                widget.statistic.last;
                                             _animation = new Tween<double>(
                                               begin: _animation.value,
-                                              end: double.parse(value) *
+                                              end: sendNWCAmount *
                                                   widget.statistic.last,
                                             ).animate(new CurvedAnimation(
                                               curve: Curves.fastOutSlowIn,
@@ -148,12 +151,14 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    PrimaryButton(
+                    SecondaryButton(
                       width: MediaQuery.of(context).size.width * 0.8,
                       margin: EdgeInsets.only(top: 10),
-                      title: "All",
-                      fontsize: 18,
-                      padding: EdgeInsets.all(10),
+                      fontsize: 11,
+                      title:
+                          "Send all of: ${widget.balance.nwc.toStringAsFixed(2)}NWC"
+                              .toUpperCase(),
+                      // padding: EdgeInsets.all(10),
                       function: () {
                         _textController.text = widget.balance.nwc.toString();
                         sendNWCAmount =
@@ -179,28 +184,35 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                       width: MediaQuery.of(context).size.width * 0.8,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).primaryColor,
+                        color: Palette.input,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           GestureDetector(
                             onTap: () async {
-                              ClipboardData clipboard =
-                                  await Clipboard.getData(Clipboard.kTextPlain);
-                              bool validAddress =
-                                  await  AccountApi().checkAddress(clipboard.text);
-                              print(validAddress);
-                              if (validAddress) {
-                                setState(() {
-                                  nwcAddress = clipboard.text;
-                                  nwcAddressPasted = true;
-                                  invalidAddress = false;
-                                });
-                              } else
+                              try {
+                                ClipboardData clipboard =
+                                    await Clipboard.getData(
+                                        Clipboard.kTextPlain);
+                                bool validAddress = await AccountApi()
+                                    .checkAddress(clipboard.text);
+                                print(validAddress);
+                                if (validAddress) {
+                                  setState(() {
+                                    nwcAddress = clipboard.text;
+                                    nwcAddressPasted = true;
+                                    invalidAddress = false;
+                                  });
+                                } else
+                                  setState(() {
+                                    invalidAddress = true;
+                                  });
+                              } catch (e) {
                                 setState(() {
                                   invalidAddress = true;
                                 });
+                              }
                             },
                             child: nwcAddressPasted
                                 ? Text.rich(
@@ -236,7 +248,10 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                         margin: EdgeInsets.only(
                           top: 10,
                         ),
-                        child: Text("Pasted address does not support NWC!"),
+                        child: Text(
+                          "Pasted address does not support NWC!",
+                          style: TextStyle(fontSize: 9),
+                        ),
                       ),
                     Container(
                       margin: EdgeInsets.only(top: 30, bottom: 10),
@@ -251,7 +266,7 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                         width: MediaQuery.of(context).size.width * 0.8,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).primaryColor,
+                          color: Palette.input,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,12 +280,12 @@ class _SendState extends State<Send> with TickerProviderStateMixin {
                             ),
                           ],
                         )),
+
                     SecondaryButton(
-                      title: "Next",
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      fontsize: 20,
+                      title: "Next".toUpperCase(),
+                      width: MediaQuery.of(context).size.width * 0.5,
                       margin: EdgeInsets.only(top: 5, bottom: 20),
-                      color: Palette.primaryButtonDefault,
+                      color: Colors.white,
                       function: () {
                         if (nwcAddressPasted)
                           Navigator.push(

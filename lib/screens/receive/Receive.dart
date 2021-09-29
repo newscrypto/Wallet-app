@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:newscrypto_wallet/services/Acount.dart';
 import 'package:newscrypto_wallet/utils/Palete.dart';
 import 'package:newscrypto_wallet/widgets/Background.dart';
+import 'package:newscrypto_wallet/widgets/BackgroundSecondary.dart';
 import 'package:newscrypto_wallet/widgets/SecondaryButton.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share/share.dart';
@@ -37,7 +38,6 @@ class _ReceiveState extends State<Receive> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double fontsize = width > 370 ? 20 : 16;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -48,13 +48,13 @@ class _ReceiveState extends State<Receive> {
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: <Color>[Colors.transparent, Colors.black26])),
+                  colors: <Color>[Colors.transparent, Colors.transparent])),
         ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          BackgroundStack(),
+          BackgroundSecondaryStack(),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,7 +62,6 @@ class _ReceiveState extends State<Receive> {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).primaryColor,
                 ),
                 padding: EdgeInsets.all(5),
                 child: QrImage(
@@ -70,9 +69,9 @@ class _ReceiveState extends State<Receive> {
                   version: QrVersions.auto,
                   size: MediaQuery.of(context).size.width * 0.6,
                   gapless: false,
-                  embeddedImage: AssetImage('assets/images/logo.png'),
+                  embeddedImage: AssetImage('assets/images/logo-black.png'),
                   embeddedImageStyle: QrEmbeddedImageStyle(
-                    size: Size(50, 50),
+                    size: Size(50, 60),
                   ),
                   foregroundColor: Colors.white,
                 ),
@@ -81,6 +80,7 @@ class _ReceiveState extends State<Receive> {
                 child: Text(
                   "Your NWC address:",
                   textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12),
                 ),
                 margin: EdgeInsets.only(top: 40, bottom: 10),
               ),
@@ -101,13 +101,14 @@ class _ReceiveState extends State<Receive> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).primaryColor,
+                    color: Palette.input,
                   ),
                   padding: EdgeInsets.all(20),
                   margin: EdgeInsets.symmetric(horizontal: 30),
                   child: Text(
                     accountId,
                     textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12),
                   ),
                 ),
               ),
@@ -119,12 +120,15 @@ class _ReceiveState extends State<Receive> {
                 ),
                 margin: EdgeInsets.only(top: 10, bottom: 10),
               ),
+              Container(
+                height: 30,
+              ),
               SecondaryButton(
-                title: "Share",
-                width: MediaQuery.of(context).size.width * 0.8,
-                fontsize: fontsize,
+                title: "Share".toUpperCase(),
+                width: MediaQuery.of(context).size.width * 0.5,
+                fontsize: width > 370 ? 14 : 12,
                 margin: EdgeInsets.only(top: 5),
-                color: Palette.primaryButtonDefault,
+                color: Colors.white,
                 function: () {
                   Share.share('My nwc address is:\n $accountId');
                 },
