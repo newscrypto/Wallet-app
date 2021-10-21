@@ -282,62 +282,28 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
                       return SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           if (loaded.length > index) {
-                            if (index == 0 ||
-                                (loaded[index - 1].dateTime.day !=
-                                    loaded[index].dateTime.day)) {
+                            if (index == loaded.length - 1) {
                               return Center(
                                   child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                  if (index == 0 && _loadingNewTransactions)
-                                    Center(
-                                      child: Container(
-                                        width: 30,
-                                        height: 30,
-                                        margin: EdgeInsets.only(top: 20),
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 3,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Palette.primaryButtonDefault),
-                                        ),
-                                      ),
-                                    ),
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                      left: 20,
-                                      right: 20,
-                                      top: 20,
-                                    ),
-                                    child: Text(DateFormat.yMd()
-                                        .format(loaded[index].dateTime)),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(top: 10),
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    child: TransactionHistoryContainer(
-                                      transaction: loaded[index],
-                                    ),
-                                  )
+                                  getTransactionContainer(loaded[index], 20),
+                                  fillRemaining(loaded.length),
                                 ],
                               ));
                             }
-                            return Center(
-                              child: Container(
-                                  margin: EdgeInsets.only(top: 20),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.8,
-                                  child: TransactionHistoryContainer(
-                                    transaction: loaded[index],
-                                  )),
-                            );
+                            if (index == 0 ||
+                                (loaded[index - 1].dateTime.day !=
+                                    loaded[index].dateTime.day)) {
+                              return getTransactionWithDate(loaded[index]);
+                            }
+                            return getTransactionContainer(loaded[index], 20);
                           } else
                             return SliverFillRemaining(
                               hasScrollBody: false,
                               child: Center(
                                 child: Text(
-                                  "List is empty",
+                                  "No transactions!",
                                   style: TextStyle(
                                     color: Colors.white,
                                   ),
@@ -432,7 +398,6 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
   void loadBalance() async {
     double nwcBalance = await AccountApi().getAccountBalance();
     Statistics nwcPrice = await PriceApi().fetchStats();
-    print(nwcPrice.buy);
     setState(() {
       statistics = nwcPrice;
       balance =
@@ -450,5 +415,42 @@ class _SliverAppBarSnapState extends State<SliverAppBarSnap>
     setState(() {
       prices = _data;
     });
+  }
+
+  Widget getTransactionContainer(transaction, double marginTop) {
+    return Center(
+      child: Container(
+          margin: EdgeInsets.only(top: marginTop),
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: TransactionHistoryContainer(
+            transaction: transaction,
+          )),
+    );
+  }
+
+  Widget fillRemaining(allItems) {
+    double remainingHeight = MediaQuery.of(context).size.height - allItems * 78;
+    double remainingHeightPositive = remainingHeight < 0 ? 0 : remainingHeight;
+    return Container(height: remainingHeightPositive);
+  }
+
+  Widget getTransactionWithDate(transaction) {
+    return Center(
+        child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 20,
+                  ),
+                  child: Text(DateFormat.yMd().format(transaction.dateTime)),
+                ),
+                getTransactionContainer(transaction, 10),
+              ],
+            )));
   }
 }

@@ -27,9 +27,7 @@ class HeaderState extends StatelessWidget {
         return SafeArea(
           child: Stack(
             children: [
-              // _buildGradient(animation),
               _buildTitle(animation, expandRatio),
-
               Align(
                   alignment: Alignment.topCenter,
                   child: Opacity(
@@ -50,15 +48,6 @@ class HeaderState extends StatelessWidget {
                   ),
                 ),
               ),
-
-                   // child: Container(
-                   //   width: MediaQuery.of(context).size.width * 0.90,
-                   //   height: maxHeight - 100,
-                   //   margin: EdgeInsets.only(top: 50),
-                   //   child: prices != null && prices.isNotEmpty
-                   //       ? GridlineDashPattern.withSampleData(prices)
-                   //       : Container(),
-                   // ))),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
@@ -178,44 +167,4 @@ class HeaderState extends StatelessWidget {
           )),
     );
   }
-
-// Container _buildGradient(Animation<double> animation) {
-//   return Container(
-//     decoration: BoxDecoration(
-//       color: Colors.black,
-//       // gradient: LinearGradient(
-//       //   colors: [
-//       //     Colors.transparent,
-//       //     ColorTween(begin: Colors.black26, end: Colors.black54)
-//       //         .evaluate(animation)
-//       //   ],
-//       //   begin: Alignment.ion: BoxDecoration(
-//       //     //   // gradient: LinearGradient(
-//       //     //   //   colors: [
-//       //     //   //     Colors.transparent,
-//       //     //   //     ColorTween(begin: Colors.black26, end: Colors.black54)
-//       //     //   //         .evaluate(animation)
-//       //     //   //   ],
-//       //     //     begin: Alignment.topCenter,
-//       //     //     end: Alignment.bottomCenter,
-//       //     //   ),topCenter,
-//       //   end: Alignment.bottomCenter,
-//     ),
-//   );
-// }
-
-//  Widget _buildImage(BuildContext context) {
-//    return Container(
-//        alignment: Alignment.center,
-//        margin: EdgeInsets.only(top: 40),
-//        height: maxHeight - 150,
-//        width: MediaQuery.of(context).size.width * 0.90,
-//        child: SimpleTimeSeriesChart.withSampleData());
-////
-////    return Image.network(
-////      "https://www.rollingstone.com/wp-content/uploads/2020/02/TheWeeknd.jpg",
-////      fit: BoxFit.cover,
-////    );
-//  }
-
 }

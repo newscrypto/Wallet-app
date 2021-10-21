@@ -71,7 +71,7 @@ class _ReceiveState extends State<Receive> {
                   gapless: false,
                   embeddedImage: AssetImage('assets/images/logo-black.png'),
                   embeddedImageStyle: QrEmbeddedImageStyle(
-                    size: Size(50, 60),
+                    size: Size(40, 45),
                   ),
                   foregroundColor: Colors.white,
                 ),

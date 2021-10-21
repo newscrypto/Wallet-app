@@ -30,6 +30,7 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
   Color copyTextColor = Colors.white;
   Color copyMemoTextColor = Colors.white;
   bool _loading = false;
+  bool noTransaction = false;
 
   @override
   void initState() {
@@ -52,26 +53,38 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
   void getActivationInfo() async {
     setState(() {
       _loading = true;
+      noTransaction=false;
     });
-    ActivationInfo newActivationInfo =
-        await ActivationApi().fetchActivationInfo(_publicKey);
-    if (newActivationInfo.activated) {
-      AccountApi().setActivate(true);
-      bool trustline = await AccountApi().createNWCTrustLine();
-      if (trustline) {
-        ActivationApi().getChange(_publicKey);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SecretKeyPage(),
-          ),
-        );
+    try {
+      ActivationInfo newActivationInfo =
+          await ActivationApi().fetchActivationInfo(_publicKey);
+      if (newActivationInfo.activated) {
+        AccountApi().setActivate(true);
+        bool trustline = await AccountApi().createNWCTrustLine();
+        if (trustline) {
+          ActivationApi().getChange(_publicKey);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SecretKeyPage(),
+            ),
+          );
+        }
+
+      } else {
+        setState(() {
+          noTransaction=true;
+        });
       }
+      setState(() {
+        _activationInfo = newActivationInfo;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
     }
-    setState(() {
-      _activationInfo = newActivationInfo;
-      _loading = false;
-    });
   }
 
   @override
@@ -90,8 +103,7 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
       //   ),
       // ),
       backgroundColor: Theme.of(context).primaryColor,
-      body:
-      Stack(
+      body: Stack(
         children: [
           BackgroundStack(),
           Center(
@@ -123,7 +135,7 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                       embeddedImage:
                           AssetImage('assets/images/logo-with-bg.png'),
                       embeddedImageStyle: QrEmbeddedImageStyle(
-                        size: Size(40, 40),
+                        size: Size(35, 35),
                       ),
                       foregroundColor: Colors.white,
                     ),
@@ -209,7 +221,6 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                     ),
                     margin: EdgeInsets.only(top: 10, bottom: 10),
                   ),
-
                   PrimaryButton(
                     title: "Activate",
                     width: width * 0.7,
@@ -218,6 +229,11 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
                     padding: EdgeInsets.all(15),
                     function: getActivationInfo,
                   ),
+                  noTransaction
+                      ? Text(
+                          "Transaction not detected",
+                        )
+                      : Text("")
                 ],
               ),
             ),
@@ -228,16 +244,30 @@ class _NewWalletState extends State<NewWallet> with TickerProviderStateMixin {
               height: MediaQuery.of(context).size.height,
               decoration: BoxDecoration(color: Colors.black54),
               child: Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  height: MediaQuery.of(context).size.width * 0.6,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 10,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        Palette.primaryButtonDefault),
-                  ),
-                ),
-              ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      height: MediaQuery.of(context).size.width * 0.6,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 10,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            Palette.primaryButtonDefault),
+                      ),
+                    ),
+                    Container(
+                        margin: EdgeInsets.only(top: 50),
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: Text(
+                          "Your wallet is being generated. Please don’t close the app until this process is complete.",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                          textAlign: TextAlign.center,
+                        ))
+                  ])),
             ),
         ],
       ),
