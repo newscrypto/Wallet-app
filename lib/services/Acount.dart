@@ -11,8 +11,7 @@ const String issuerKey =
     "GDZJD363YP7P3TNYDK3ZD6GLXFMAI3GLVIH7CGFLNZWIZBQUCVE6PTU7";
 const String issuerKeyNew =
     "GAAPUOQWOZAG3PENRN7FEPYWXVGJBJVBL6EUE2ZHN5TSY7WBXQDO7AY2";
-const String distribution =
-    "GBPAWN5KBPN2H4HLOR6SXNDLFBMEORYU4PZ77BK3Z3YK2IRA6HSJWIXL";
+
 const ASSET_CODE = "NWC";
 
 final StellarSDK sdk = StellarSDK.PUBLIC;
@@ -67,7 +66,6 @@ class AccountApi {
 
   Future<bool> createNWCTrustLine() async {
     String accountSecret = await getAccountSecret();
-    Asset nwcAsset = Asset.createNonNativeAsset(ASSET_CODE, issuerKey);
     Asset nwcAssetNew = Asset.createNonNativeAsset(ASSET_CODE, issuerKeyNew);
 
     KeyPair senderKeyPair = KeyPair.fromSecretSeed(accountSecret);
@@ -75,12 +73,9 @@ class AccountApi {
         await sdk.accounts.account(senderKeyPair.accountId);
 
     String limit = "922337203681";
-    ChangeTrustOperation cto =
-        ChangeTrustOperationBuilder(nwcAsset, limit).build();
     ChangeTrustOperation ctoNew =
         ChangeTrustOperationBuilder(nwcAssetNew, limit).build();
     Transaction transaction = TransactionBuilder(sender)
-        .addOperation(cto)
         .addOperation(ctoNew)
         .build();
 
@@ -229,9 +224,7 @@ class AccountApi {
       if (response is PaymentOperationResponse) {
         PaymentOperationResponse por = response;
         if (por.transactionSuccessful &&
-            por.assetCode == "NWC" &&
-            por.to.accountId != issuerKey &&
-            por.from.accountId != distribution) {
+            por.assetCode == "NWC") {
           transactions
               .add(new WalletTransaction.fromPaymentOperation(por, accountId));
         }
